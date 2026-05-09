@@ -111,6 +111,14 @@ The following standard campaign metrics require fields not present in this datas
 
 ---
 
+## Production analytics roadmap (beyond this dataset)
+
+**Promise-Match Rate** — checks whether the feature users try after installing matches the LP's primary promise. With this dataset, alignment is near-perfect: 99.7% of Academic Writing LP users reach `academic_citation_helper` and 100% of Business Emails LP users reach `smart_email_reply`. This makes Promise-Match Rate a monitoring metric rather than a diagnostic one for these two LPs. It becomes critical in production when multiple LPs overlap in audience, when new features are added, or when campaigns are suspected of attracting off-intent users. Formula: users who tried the feature promised by the LP / users who tried any feature after that LP.
+
+**Activation-Risk Scoring** — with richer metadata (campaign, keyword, device, country, creative, quiz answers, page engagement), a lightweight propensity model could predict at the install stage whether a user is likely to activate. High-risk users — those likely to become dead installs — could be surfaced for targeted onboarding interventions: in-app prompts, email sequences, or feature tooltips timed to first session. For this mock dataset the sample size and available features are insufficient for a credible model. This is a production roadmap item, not a current calculation.
+
+---
+
 ## Recommended next instrumentation
 
 1. **Add page render events** — required to calculate LP page-render CVR (signups / renders), the primary metric from the original brief

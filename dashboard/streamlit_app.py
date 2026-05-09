@@ -108,8 +108,8 @@ def compute_lp_metrics(uf: pd.DataFrame) -> pd.DataFrame:
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### Grammarly Campaigns")
-    st.caption("Feb 2026 · 2 LPs · 3,200 users")
+    st.markdown("### Growth Command Center")
+    st.caption("Grammarly Campaign Analytics · Feb 2026")
     st.divider()
 
     # LP filter
@@ -386,17 +386,25 @@ with tabs[1]:
             sty = sty.highlight_max(subset=[c for c in bad_cols  if c in tbl.columns], color="#fdf2e9")
         st.dataframe(sty, use_container_width=True, hide_index=True)
 
-    # Cohort chart
+    # Cohort chart with anomaly detection
     st.markdown("#### Cohort Activation CVR Over Time")
     st.caption(
-        "% of each cohort day's clickers who reached try_grammarly within 7 days. "
-        "Daily values vary — the trend matters more than individual days."
+        "Daily cohort CVR with optional 7-day rolling average. "
+        "Orange markers = days where CVR fell >1.5σ below the rolling average (anomaly flag). "
+        "Last 2–3 cohort days may show lower CVR as their 7-day attribution windows extend beyond the dataset."
     )
     if not coh_f.empty:
         plot_df = coh_f.copy()
-        if show_rolling:
-            plot_df["Rolling 7-day avg"] = plot_df.groupby("LP")["activation_cvr"] \
-                .transform(lambda x: x.rolling(7, min_periods=3).mean())
+
+        # Rolling average + anomaly detection (per LP)
+        plot_df["rolling_avg"] = plot_df.groupby("LP")["activation_cvr"] \
+            .transform(lambda x: x.rolling(7, min_periods=3).mean())
+        plot_df["rolling_std"] = plot_df.groupby("LP")["activation_cvr"] \
+            .transform(lambda x: x.rolling(7, min_periods=3).std().fillna(0.001))
+        plot_df["is_anomaly"] = (
+            plot_df["activation_cvr"] <
+            (plot_df["rolling_avg"] - 1.5 * plot_df["rolling_std"])
+        )
 
         fig = go.Figure()
         for lp_name, color in COLOR_MAP.items():
@@ -407,15 +415,29 @@ with tabs[1]:
                 x=sub["cohort_date"], y=sub["activation_cvr"],
                 name=lp_name, mode="lines+markers",
                 line=dict(color=color, width=1.5),
-                marker=dict(size=4), opacity=0.5,
-                hovertemplate="%{x|%b %-d}<br>Activation CVR: %{y:.1%}<extra>" + lp_name + "</extra>",
+                marker=dict(size=4), opacity=0.45,
+                hovertemplate="%{x|%b %-d}<br>CVR: %{y:.1%}<extra>" + lp_name + "</extra>",
             ))
-            if show_rolling and "Rolling 7-day avg" in sub.columns:
+            if show_rolling:
                 fig.add_trace(go.Scatter(
-                    x=sub["cohort_date"], y=sub["Rolling 7-day avg"],
-                    name=f"{lp_name} — 7d avg", mode="lines",
+                    x=sub["cohort_date"], y=sub["rolling_avg"],
+                    name=f"{lp_name} 7d avg", mode="lines",
                     line=dict(color=color, width=2.5),
-                    hovertemplate="%{x|%b %-d}<br>7-day avg: %{y:.1%}<extra>" + lp_name + "</extra>",
+                    hovertemplate="%{x|%b %-d}<br>7d avg: %{y:.1%}<extra>" + lp_name + "</extra>",
+                ))
+            # Anomaly markers
+            anom = sub[sub["is_anomaly"]]
+            if not anom.empty:
+                fig.add_trace(go.Scatter(
+                    x=anom["cohort_date"], y=anom["activation_cvr"],
+                    mode="markers", name=f"{lp_name} — flag",
+                    marker=dict(color=C["warn"], size=12, symbol="x",
+                                line=dict(width=2.5, color=C["warn"])),
+                    hovertemplate=(
+                        "%{x|%b %-d}<br>CVR: %{y:.1%}<br>"
+                        "<b>Below rolling avg − 1.5σ</b>"
+                        "<extra>Flag · " + lp_name + "</extra>"
+                    ),
                 ))
         fig.update_layout(
             plot_bgcolor="white", yaxis_tickformat=".0%",
@@ -425,6 +447,14 @@ with tabs[1]:
             margin=dict(t=20, b=20),
         )
         st.plotly_chart(fig, use_container_width=True)
+
+        n_flags = int(plot_df["is_anomaly"].sum())
+        if n_flags > 0:
+            st.caption(
+                f"{n_flags} cohort day(s) flagged below threshold. "
+                "In production, these would trigger an automated alert to investigate "
+                "possible tracking issues, campaign changes, or audience quality shifts."
+            )
 
 # ═════════════════════════════════════════════════════════════════════════════
 # TAB 3 — ACTIVATION
@@ -566,7 +596,7 @@ with tabs[3]:
                 f"<div style='border-left:4px solid {color}; padding:14px 18px; "
                 f"background:{bg}; border-radius:0 10px 10px 0; margin-bottom:12px;'>"
                 f"<strong style='color:{color}'>{lp_label}</strong><br/>"
-                f"<span style='font-size:13px; color:{C[\"muted\"]}; line-height:1.6'>{text}</span>"
+                f"<span style='font-size:13px; color:#5f6b7a; line-height:1.6'>{text}</span>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
@@ -576,6 +606,43 @@ with tabs[3]:
             "it would generate approximately **+66 additional activated users** from the same "
             "February traffic — a 22% lift at zero additional acquisition cost."
         )
+
+        # Wasted Acquisition Ledger
+        st.markdown("##### Wasted Acquisition Ledger")
+        st.caption(
+            "Where does the month's LP traffic fail to reach sustained value? "
+            "Add spend data and each row becomes a direct cost line."
+        )
+        repeat_users = int(uf_f["is_repeat_try_user"].sum()) if not uf_f.empty else 0
+        not_installed      = max(tot_clicks - tot_installs, 0)
+        installed_not_tried = max(tot_installs - tot_tries, 0)
+        tried_not_repeat   = max(tot_tries - repeat_users, 0)
+        total_leak         = not_installed + installed_not_tried + tried_not_repeat
+        pct = lambda n: f"{n/tot_clicks:.1%}" if tot_clicks else "—"
+        ledger_df = pd.DataFrame([
+            {"Leakage Stage": "Clicked LP but did not install",
+             "Users": not_installed, "% of LP Clicks": pct(not_installed),
+             "Next Action": "Improve install bridge / extension explanation"},
+            {"Leakage Stage": "Installed but never tried Grammarly",
+             "Users": installed_not_tried, "% of LP Clicks": pct(installed_not_tried),
+             "Next Action": "Post-install onboarding — guided first-use path"},
+            {"Leakage Stage": "Tried once, never returned within 7 days",
+             "Users": tried_not_repeat, "% of LP Clicks": pct(tried_not_repeat),
+             "Next Action": "Re-engagement trigger (email, in-app prompt)"},
+            {"Leakage Stage": "Total wasted acquisition",
+             "Users": total_leak, "% of LP Clicks": pct(total_leak),
+             "Next Action": ""},
+        ])
+        st.dataframe(ledger_df, use_container_width=True, hide_index=True)
+        if tot_clicks > 0:
+            pct_sustained = repeat_users / tot_clicks
+            st.caption(
+                f"Only **{repeat_users:,}** of {tot_clicks:,} LP CTA clickers "
+                f"({pct_sustained:.1%}) reached sustained activation "
+                f"(tried Grammarly more than once within 7 days). "
+                f"The 43–51% dead install rate is the highest-leverage fix: "
+                f"it sits between install and first use, downstream of both LPs."
+            )
 
         st.markdown("##### Experiment Backlog")
         exp_df = pd.DataFrame([

@@ -106,6 +106,43 @@ Paste text → visible preview → 3 personalization questions → refined previ
 
 ---
 
+## Experiment design
+
+I would not launch this as a blind redesign. Variant B is structured as a proper A/B test against the existing LP, not a one-off page swap.
+
+**Hypothesis:** Users searching "free AI humanizer" want immediate proof of value. A preview-first quiz flow — paste text, see a partial rewrite, answer 3 personalization questions, then sign up to copy the full result — will increase signup CVR because users commit only after seeing relevant output, not before.
+
+**Control:** Current LP (quiz-first, 8 questions, hard signup modal after 6-second load)
+**Variant B:** Preview-first micro-quiz (this deliverable)
+**Split:** 50/50, cookie-level randomization on page render
+
+**Primary metric:** Signup CVR = signups / page renders
+
+**Secondary metrics — understanding the mechanism of lift:**
+
+| Metric | Purpose |
+|---|---|
+| Preview requested rate | Did users engage with the paste box before questions? |
+| Quiz completion rate | Did showing value first reduce quiz abandonment? |
+| Unlock wall viewed rate | Did more users reach the signup gate? |
+| Unlock wall → signup click rate | Was the inline card more persuasive than the hard modal? |
+| Time to first value (`time_to_preview_ms`) | How quickly did users see a rewrite? |
+
+**Guardrail metrics — protecting downstream quality:**
+
+Signup CVR is not the only measure of success. The guardrails matter equally.
+
+| Guardrail | Why it matters |
+|---|---|
+| Install rate (among signups) | A variant that drives low-quality signups who never install is not a win |
+| `try_grammarly` rate (among installs) | The goal is qualified activation, not just account creation |
+| Dead install rate | A lift in signups that produces more dead installs means weaker intent |
+| Brand-risk signals | Qualitative feedback, support tickets, negative social signals |
+
+The right framing is not "did Variant B get more signups?" It is "did Variant B get more users who installed and tried Grammarly?"
+
+---
+
 ## A/B test decision rules
 
 **Ship Variant B if, at 95% confidence:**
