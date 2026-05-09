@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"original\\\\humanizer.html\")",
+      "Bash(Select-Object Length)",
+      "Bash(python dashboard/data_cleaning.py)",
+      "Bash(pip install *)",
+      "Bash(python -c ' *)"
+    ]
+  }
+}

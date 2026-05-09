@@ -1,0 +1,9 @@
+check,severity,flagged_rows,explanation
+missing_lp_name_on_lp_click,high,0,Breaks LP performance attribution.
+missing_product_feature_on_try,high,0,Breaks feature adoption analysis.
+null_user_id,high,0,Prevents user-level funnel analysis.
+null_session_id,medium,0,Weakens session-level QA.
+invalid_timestamp,high,0,Breaks sequencing and attribution windows.
+unknown_action,medium,0,Unexpected action value.
+extra_parse_error,medium,0,Could not parse metadata JSON.
+duplicate_events,medium,0,May inflate raw event counts.

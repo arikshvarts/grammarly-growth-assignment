@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run dashboard data cleaning",
+      "type": "shell",
+      "command": "python dashboard/data_cleaning.py",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Open improved LP",
+      "type": "shell",
+      "command": "python -m webbrowser lp/improved_humanizer.html",
+      "problemMatcher": []
+    }
+  ]
+}

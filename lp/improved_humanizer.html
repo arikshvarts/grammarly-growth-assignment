@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grammarly — AI Humanizer | Make AI Writing Sound Natural</title>
+  <meta name="description" content="Paste AI-assisted text and preview a clearer, more natural version. Free preview — no credit card required." />
+  <style>
+    :root {
+      --bg: #f5f7f6;
+      --card: #ffffff;
+      --text: #1b2333;
+      --muted: #5f6b7a;
+      --border: #dde4e1;
+      --accent: #14a46c;
+      --accent-dk: #0d8055;
+      --accent-lt: #eaf7f1;
+      --before-bg: #fdfbf6;
+      --after-bg: #f0faf5;
+      --shadow: 0 4px 24px rgba(23,35,51,.09);
+      --r: 20px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px;
+    }
+    .logo { font-size: 18px; font-weight: 800; letter-spacing: -.3px; color: var(--text); }
+    .logo em { color: var(--accent); font-style: normal; }
+    .btn-nav {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 999px; padding: 9px 22px;
+      font: 600 14px/1 inherit; cursor: pointer; text-decoration: none;
+      transition: background .15s;
+    }
+    .btn-nav:hover { background: var(--accent-dk); }
+
+    /* LAYOUT */
+    main { max-width: 1000px; margin: 0 auto; padding: 52px 20px 100px; }
+
+    /* HERO */
+    .hero {
+      display: grid; grid-template-columns: 1fr 1.12fr;
+      gap: 36px; align-items: start; margin-bottom: 36px;
+    }
+    .hero-text { padding-top: 8px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-lt); color: var(--accent);
+      font: 600 13px/1 inherit; padding: 6px 14px;
+      border-radius: 999px; margin-bottom: 20px;
+    }
+    h1 {
+      font-size: clamp(26px, 3.8vw, 46px);
+      font-weight: 800; line-height: 1.06;
+      letter-spacing: -.8px; margin-bottom: 18px;
+    }
+    .hero-sub { font-size: 16px; color: var(--muted); line-height: 1.65; margin-bottom: 28px; }
+    .trust-row { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+    .trust-item {
+      font-size: 13px; color: var(--muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .trust-item::before { content: "✓"; color: var(--accent); font-weight: 700; }
+
+    /* PASTE CARD */
+    .paste-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); box-shadow: var(--shadow); padding: 24px;
+    }
+    .input-label {
+      font: 600 12px/1 inherit; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .6px;
+      display: block; margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%; min-height: 148px; resize: vertical;
+      border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 13px 15px; font: 15px/1.6 inherit; color: var(--text);
+      outline: none; transition: border-color .15s; background: #f9fbfa;
+    }
+    textarea:focus { border-color: var(--accent); background: #fff; }
+    textarea::placeholder { color: #a8b5be; }
+    textarea.error { border-color: #e25a5a; }
+
+    .chips-label { font-size: 12px; color: var(--muted); margin: 12px 0 6px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+    .chip {
+      background: #f2f5f3; border: 1.5px solid var(--border);
+      border-radius: 999px; padding: 6px 13px;
+      font: 500 12px/1 inherit; color: var(--muted);
+      cursor: pointer; transition: all .13s;
+    }
+    .chip:hover, .chip.active {
+      background: var(--accent-lt); border-color: var(--accent); color: var(--accent);
+    }
+
+    .btn-preview {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; background: var(--accent); color: #fff; border: none;
+      border-radius: 14px; padding: 15px 20px;
+      font: 700 16px/1 inherit; cursor: pointer; transition: all .15s;
+    }
+    .btn-preview:hover {
+      background: var(--accent-dk); transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(20,164,108,.25);
+    }
+    .microcopy { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+
+    /* CARD */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); box-shadow: var(--shadow);
+      padding: 28px; margin-bottom: 16px;
+    }
+
+    /* SECTION HEADER */
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+    .step-pill {
+      font: 700 11px/1 inherit; text-transform: uppercase; letter-spacing: .7px;
+      padding: 4px 11px; border-radius: 999px;
+      background: var(--accent-lt); color: var(--accent);
+    }
+    .step-pill.purple { background: #f0eaff; color: #7c5cbf; }
+    .section-title { font: 700 20px/1.2 inherit; }
+
+    /* PREVIEW GRID */
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .preview-panel { border-radius: 14px; padding: 16px; min-height: 120px; position: relative; overflow: hidden; }
+    .preview-panel.before { background: var(--before-bg); border: 1px solid #e8e2d5; }
+    .preview-panel.after  { background: var(--after-bg);  border: 1px solid #c5e8d8; }
+    .panel-label { font: 700 11px/1 inherit; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); margin-bottom: 10px; }
+    .panel-text  { font-size: 14px; line-height: 1.7; color: var(--text); }
+    .panel-text .hl { background: #c9f0de; border-radius: 3px; padding: 1px 2px; }
+    .fade-lock {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 64px;
+      background: linear-gradient(to bottom, transparent, var(--after-bg) 85%);
+      border-radius: 0 0 14px 14px; pointer-events: none;
+    }
+
+    /* IMPROVEMENTS */
+    .improvements { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .imp-item {
+      display: flex; align-items: flex-start; gap: 9px;
+      background: var(--accent-lt); border-radius: 12px; padding: 12px 14px;
+    }
+    .imp-check { color: var(--accent); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .imp-text { font: 600 13px/1.2 inherit; color: var(--text); }
+    .imp-sub  { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+    /* VOICE PROFILE */
+    .voice-profile {
+      display: flex; align-items: center; gap: 14px;
+      background: #f6f2ff; border: 1px solid #ddd4f7;
+      border-radius: 12px; padding: 12px 16px; margin-top: 18px;
+    }
+    .voice-lbl { font: 700 11px/1 inherit; text-transform: uppercase; letter-spacing: .6px; color: #7c5cbf; white-space: nowrap; }
+    .voice-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .voice-tag { background: #ede8fb; color: #6b4bb5; font: 600 13px/1 inherit; padding: 5px 13px; border-radius: 999px; }
+
+    /* QUIZ */
+    .q-progress { font: 700 12px/1 inherit; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); margin-bottom: 10px; }
+    .q-question { font: 700 20px/1.3 inherit; margin-bottom: 18px; }
+    .q-options { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .q-options.cols-3 { grid-template-columns: repeat(3,1fr); }
+    .q-opt {
+      background: #fff; border: 2px solid var(--border); border-radius: 14px;
+      padding: 14px 16px; cursor: pointer; text-align: left;
+      transition: all .13s; font: inherit;
+    }
+    .q-opt:hover, .q-opt.selected { border-color: var(--accent); background: var(--accent-lt); }
+    .opt-name { font: 600 14px/1 inherit; color: var(--text); }
+    .opt-desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+    /* UNLOCK CARD */
+    .unlock-card {
+      background: #fff; border: 2px solid var(--accent);
+      border-radius: var(--r); box-shadow: 0 6px 40px rgba(20,164,108,.14);
+      padding: 36px 32px; text-align: center; margin-bottom: 16px;
+    }
+    .unlock-icon  { font-size: 32px; margin-bottom: 14px; }
+    .unlock-title { font: 800 26px/1.1 inherit; letter-spacing: -.4px; margin-bottom: 10px; }
+    .unlock-sub   { font-size: 16px; color: var(--muted); line-height: 1.6; margin-bottom: 26px; }
+    .btn-unlock {
+      display: inline-block; width: 100%; max-width: 420px;
+      background: var(--accent); color: #fff; border: none; border-radius: 14px;
+      padding: 16px 32px; font: 700 16px/1 inherit; cursor: pointer;
+      text-decoration: none; transition: all .15s; margin-bottom: 10px;
+    }
+    .btn-unlock:hover { background: var(--accent-dk); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(20,164,108,.3); }
+    .unlock-micro { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+    /* ANYWHERE BRIDGE */
+    .anywhere-bridge { border-top: 1px solid var(--border); padding-top: 22px; }
+    .anywhere-title { font: 600 14px/1 inherit; color: var(--muted); margin-bottom: 14px; }
+    .platform-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+    .platform-pill {
+      background: #f2f5f3; border: 1px solid var(--border);
+      border-radius: 999px; padding: 7px 16px;
+      font: 500 13px/1 inherit; color: var(--muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 760px) {
+      .hero, .preview-grid, .improvements { grid-template-columns: 1fr; }
+      .q-options, .q-options.cols-3 { grid-template-columns: 1fr; }
+      nav { padding: 12px 18px; }
+      main { padding: 28px 14px 80px; }
+      .unlock-card { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav aria-label="Site navigation">
+  <div class="logo"><em>Grammarly</em> AI Humanizer</div>
+  <a href="https://www.grammarly.com/signup" class="btn-nav" onclick="trackEvent('nav_cta_clicked')">
+    Get Grammarly Free
+  </a>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" id="heroSection" aria-label="Hero">
+    <div class="hero-text">
+      <div class="badge">✦ Free Preview</div>
+      <h1>Make AI writing sound natural and true to your voice</h1>
+      <p class="hero-sub">
+        Paste your text and preview a clearer, more natural version — free, no credit card
+        required. Then personalize the rewrite in three quick questions.
+      </p>
+      <div class="trust-row">
+        <span class="trust-item">Keep your meaning</span>
+        <span class="trust-item">Improve clarity and flow</span>
+        <span class="trust-item">Match your voice</span>
+      </div>
+    </div>
+
+    <div class="paste-card">
+      <label class="input-label" for="inputText">Your text</label>
+      <textarea
+        id="inputText"
+        placeholder="Paste AI-assisted writing here..."
+        maxlength="3000"
+        aria-label="Text to improve"
+      ></textarea>
+      <p class="chips-label">Or try a sample:</p>
+      <div class="chips" role="group" aria-label="Sample text options">
+        <button class="chip" data-sample="essay">Essay intro</button>
+        <button class="chip" data-sample="email">Work email</button>
+        <button class="chip" data-sample="marketing">Marketing</button>
+        <button class="chip" data-sample="linkedin">LinkedIn post</button>
+        <button class="chip" data-sample="job">Job application</button>
+      </div>
+      <button class="btn-preview" id="previewBtn">
+        Preview my rewrite <span aria-hidden="true">→</span>
+      </button>
+      <p class="microcopy">Free preview. No credit card required.</p>
+    </div>
+  </section>
+
+  <!-- PREVIEW SECTION -->
+  <section id="previewSection" hidden aria-label="Preview and personalization">
+
+    <!-- Initial before/after -->
+    <div class="card" id="initialPreviewCard">
+      <div class="section-header">
+        <span class="step-pill">Preview</span>
+        <span class="section-title">Here's a more natural version</span>
+      </div>
+      <div class="preview-grid" aria-label="Before and after comparison">
+        <div class="preview-panel before">
+          <div class="panel-label">Original</div>
+          <div class="panel-text" id="originalText"></div>
+        </div>
+        <div class="preview-panel after">
+          <div class="panel-label">Grammarly suggestion</div>
+          <div class="panel-text" id="previewText"></div>
+          <div class="fade-lock" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="improvements" aria-label="What improved">
+        <div class="imp-item">
+          <span class="imp-check" aria-hidden="true">✓</span>
+          <div><div class="imp-text">More natural phrasing</div><div class="imp-sub">Reduced robotic sentence patterns</div></div>
+        </div>
+        <div class="imp-item">
+          <span class="imp-check" aria-hidden="true">✓</span>
+          <div><div class="imp-text">Smoother flow</div><div class="imp-sub">Better sentence rhythm and transitions</div></div>
+        </div>
+        <div class="imp-item">
+          <span class="imp-check" aria-hidden="true">✓</span>
+          <div><div class="imp-text">Meaning preserved</div><div class="imp-sub">Your ideas stay intact</div></div>
+        </div>
+        <div class="imp-item">
+          <span class="imp-check" aria-hidden="true">✓</span>
+          <div><div class="imp-text">Tone matched</div><div class="imp-sub">Writing feels more like you</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz -->
+    <div class="card" id="quizCard">
+
+      <!-- Q1 -->
+      <div id="q1" class="quiz-step">
+        <div class="q-progress">Personalize your rewrite — 1 of 3</div>
+        <div class="q-question">Where will you use this?</div>
+        <div class="q-options" role="group">
+          <button class="q-opt" data-q="1" data-val="work">
+            <div class="opt-name">Work email or report</div>
+            <div class="opt-desc">Professional communication</div>
+          </button>
+          <button class="q-opt" data-q="1" data-val="essay">
+            <div class="opt-name">Essay or application</div>
+            <div class="opt-desc">Academic or formal writing</div>
+          </button>
+          <button class="q-opt" data-q="1" data-val="marketing">
+            <div class="opt-name">Marketing or social post</div>
+            <div class="opt-desc">Engaging, attention-grabbing</div>
+          </button>
+          <button class="q-opt" data-q="1" data-val="general">
+            <div class="opt-name">General writing</div>
+            <div class="opt-desc">Everyday communication</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div id="q2" class="quiz-step" hidden>
+        <div class="q-progress">Personalize your rewrite — 2 of 3</div>
+        <div class="q-question">How should it sound?</div>
+        <div class="q-options" role="group">
+          <button class="q-opt" data-q="2" data-val="natural">
+            <div class="opt-name">Natural</div>
+            <div class="opt-desc">Conversational and authentic</div>
+          </button>
+          <button class="q-opt" data-q="2" data-val="professional">
+            <div class="opt-name">Professional</div>
+            <div class="opt-desc">Clear and credible</div>
+          </button>
+          <button class="q-opt" data-q="2" data-val="conversational">
+            <div class="opt-name">Conversational</div>
+            <div class="opt-desc">Warm and approachable</div>
+          </button>
+          <button class="q-opt" data-q="2" data-val="confident">
+            <div class="opt-name">Confident</div>
+            <div class="opt-desc">Assertive and direct</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div id="q3" class="quiz-step" hidden>
+        <div class="q-progress">Personalize your rewrite — 3 of 3</div>
+        <div class="q-question">How much should Grammarly change?</div>
+        <div class="q-options cols-3" role="group">
+          <button class="q-opt" data-q="3" data-val="light">
+            <div class="opt-name">Light polish</div>
+            <div class="opt-desc">Minor improvements, your structure stays</div>
+          </button>
+          <button class="q-opt" data-q="3" data-val="balanced">
+            <div class="opt-name">Balanced rewrite</div>
+            <div class="opt-desc">Noticeable improvements, core ideas preserved</div>
+          </button>
+          <button class="q-opt" data-q="3" data-val="strong">
+            <div class="opt-name">Stronger rewrite</div>
+            <div class="opt-desc">Significant clarity and flow improvements</div>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /quizCard -->
+
+    <!-- REFINED SECTION -->
+    <div id="refinedSection" hidden>
+
+      <div class="card">
+        <div class="section-header">
+          <span class="step-pill purple">Personalized</span>
+          <span class="section-title">Your refined rewrite</span>
+        </div>
+        <div class="preview-grid" aria-label="Personalized before and after">
+          <div class="preview-panel before">
+            <div class="panel-label">Original</div>
+            <div class="panel-text" id="refinedOriginal"></div>
+          </div>
+          <div class="preview-panel after">
+            <div class="panel-label">Personalized for you</div>
+            <div class="panel-text" id="refinedText"></div>
+            <div class="fade-lock" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="improvements" id="refinedImprovements" aria-label="Personalized improvements"></div>
+        <div class="voice-profile">
+          <span class="voice-lbl">Your voice</span>
+          <div class="voice-tags" id="voiceTags"></div>
+        </div>
+      </div>
+
+      <!-- Unlock card -->
+      <div class="unlock-card">
+        <div class="unlock-icon" aria-hidden="true">✦</div>
+        <div class="unlock-title">Your full rewrite is ready</div>
+        <p class="unlock-sub">
+          You've seen the preview. Create a free account to copy the full rewrite,
+          save your voice settings, and keep editing your tone.
+        </p>
+        <button class="btn-unlock" onclick="handleSignup()">
+          Create free account to copy full rewrite
+        </button>
+        <p class="unlock-micro">No credit card required.</p>
+        <div class="anywhere-bridge">
+          <p class="anywhere-title">Humanize and polish text anywhere you write</p>
+          <div class="platform-list">
+            <span class="platform-pill">Gmail</span>
+            <span class="platform-pill">Google Docs</span>
+            <span class="platform-pill">LinkedIn</span>
+            <span class="platform-pill">ChatGPT</span>
+            <span class="platform-pill">Work documents</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /refinedSection -->
+  </section><!-- /previewSection -->
+
+</main>
+
+<script>
+// ============================================================
+// EVENT TRACKING
+// ============================================================
+function trackEvent(name, props) {
+  console.log("[trackEvent]", name, Object.assign({
+    variant_id: "preview_first_v1",
+    lp_name: "ai_humanizer_improved",
+    device_type: window.innerWidth < 760 ? "mobile" : "desktop",
+    ts: new Date().toISOString()
+  }, props || {}));
+}
+trackEvent("lp_rendered");
+
+// ============================================================
+// SAMPLE TEXTS
+// ============================================================
+var SAMPLES = {
+  essay:     "This essay will discuss how technology has changed communication in modern society. The internet has made it possible for people to communicate across the world. This is important because it allows for the sharing of information and ideas between different cultures.",
+  email:     "I am writing to follow up on our previous conversation about the project timeline. I wanted to check in to see if there are any updates. Please let me know if you need any additional information from my side and I will be happy to provide it.",
+  marketing: "Our product helps teams work better together by improving their productivity. It makes communication easier and allows people to collaborate more effectively. Our customers have seen significant improvements in their overall output and satisfaction.",
+  linkedin:  "I am very excited to share that I have recently started a new position at a leading technology company. This role is focused on using AI to improve writing and communication across teams. I am looking forward to the challenges and opportunities ahead.",
+  job:       "I am applying for this position because I believe I have the skills and experience that are needed for this role. I have worked in this field for several years and have developed strong abilities in the relevant areas. I am confident that I can make a positive contribution."
+};
+
+// ============================================================
+// REWRITE ENGINE
+// ============================================================
+// General AI-phrasing substitutions (applied at all strengths)
+var BASE_SUBS = [
+  [/\bI am writing to follow up\b/g,                          "I'm following up"],
+  [/\bI am writing to\b/g,                                    "I wanted to"],
+  [/\bI am applying for\b/g,                                  "I'm applying for"],
+  [/\bI am very excited to share\b/g,                         "I'm excited to share"],
+  [/\bI am excited to share\b/g,                              "I'm excited to share"],
+  [/\bI am looking forward to\b/g,                            "I look forward to"],
+  [/\bI have recently\b/g,                                    "I recently"],
+  [/\bI have worked\b/g,                                      "I've worked"],
+  [/\bI believe I have\b/g,                                   "I bring"],
+  [/\bI am confident that I can\b/g,                          "I'm confident I can"],
+  [/\bwill discuss how\b/g,                                   "explores how"],
+  [/\bwill discuss\b/g,                                       "explores"],
+  [/\bis important because\b/g,                               "matters because"],
+  [/\bhas made it possible for people to\b/g,                 "lets people"],
+  [/\bhas made it possible\b/g,                               "makes it possible"],
+  [/\bcheck in to see if there are any updates\b/g,           "check whether there are any updates"],
+  [/\bcheck in to see if\b/g,                                 "check whether"],
+  [/\bPlease let me know if you need any additional information from my side\b/g, "Let me know if you need anything else"],
+  [/\bPlease let me know if\b/g,                              "Let me know if"],
+  [/\bfrom my side\b/g,                                       "on my end"],
+  [/\bI will be happy to provide it\b/g,                      "I'm happy to help"],
+  [/\bwork better together\b/g,                               "collaborate more effectively"],
+  [/\bimproving their productivity\b/g,                       "boosting productivity"],
+  [/\bIt makes communication easier\b/g,                      "It streamlines communication"],
+  [/\ballow people to collaborate more effectively\b/g,       "support effective collaboration"],
+  [/\bsignificant improvements\b/gi,                          "meaningful improvements"],
+  [/\bThis role is focused on\b/g,                            "In this role, I'll focus on"],
+  [/\bthat are needed for\b/g,                                "required for"],
+  [/\bhave developed strong abilities\b/g,                    "have built strong skills"],
+  [/\bin the relevant areas\b/g,                              "across these areas"],
+  [/\bmake a positive contribution\b/g,                       "make a strong contribution"],
+  [/\bbetween different cultures\b/g,                         "across cultures"],
+  [/\bThis is important because\b/g,                          "It matters because"],
+  // General AI tells
+  [/\bIn order to\b/g,                                        "To"],
+  [/\bdue to the fact that\b/g,                               "because"],
+  [/\ba large number of\b/g,                                  "many"],
+  [/\bin the event that\b/g,                                  "if"],
+  [/\bmake use of\b/g,                                        "use"],
+  [/\butilize\b/g,                                            "use"],
+  [/\bdemonstrate\b/g,                                        "show"],
+  [/\bfacilitate\b/g,                                         "help"],
+  [/\bIt is worth noting that\b/g,                            "Notably,"],
+  [/\bFurthermore\b/g,                                        "Also"],
+  [/\bIn conclusion\b/g,                                      "In short"],
+  [/\bsubsequently\b/g,                                       "then"],
+  [/\bnevertheless\b/g,                                       "even so"]
+];
+
+var BALANCED_EXTRA = [
+  [/\bhas changed\b/g,                                        "has transformed"],
+  [/\ballow for the sharing of\b/g,                           "support sharing of"],
+  [/\bOur customers have seen\b/g,                            "Teams using our product report"]
+];
+
+var STRONG_EXTRA = [
+  [/\boverall output and satisfaction\b/g,                    "output, morale, and results"],
+  [/\bchallenges and opportunities ahead\b/g,                 "work ahead"]
+];
+
+function applySubs(text, subs) {
+  var out = text;
+  for (var i = 0; i < subs.length; i++) out = out.replace(subs[i][0], subs[i][1]);
+  return out;
+}
+
+function applyTone(text, tone) {
+  if (tone === "professional") {
+    return text.replace(/\bI'm\b/g, "I am").replace(/\bI've\b/g, "I have").replace(/\bI'll\b/g, "I will").replace(/\bI'm happy\b/g, "I am happy");
+  }
+  if (tone === "conversational" || tone === "natural") {
+    return text.replace(/\bI am\b/g, "I'm").replace(/\bI have\b/g, "I've");
+  }
+  return text;
+}
+
+function generateRewrite(text, answers) {
+  var tone = answers.q2 || "natural";
+  var strength = answers.q3 || "balanced";
+  var out = applySubs(text, BASE_SUBS);
+  if (strength === "balanced" || strength === "strong") out = applySubs(out, BALANCED_EXTRA);
+  if (strength === "strong") out = applySubs(out, STRONG_EXTRA);
+  out = applyTone(out, tone);
+  return out;
+}
+
+// ============================================================
+// HIGHLIGHT CHANGED PHRASES
+// ============================================================
+var HL_PHRASES = [
+  "I'm following up","I wanted to","I'm applying for","I'm excited to share",
+  "I look forward to","I recently","I've worked","I bring","I'm confident I can",
+  "explores how","explores","matters because","lets people","makes it possible",
+  "check whether","Let me know if","on my end","I'm happy to help",
+  "collaborate more effectively","boosting productivity","streamlines communication",
+  "support effective collaboration","meaningful improvements","In this role, I'll focus on",
+  "required for","built strong skills","across these areas","make a strong contribution",
+  "across cultures","It matters because","has transformed","support sharing of",
+  "Teams using our product report","Notably,",
+  "even so","output, morale, and results"
+];
+
+function highlightHTML(text) {
+  // Escape HTML
+  var html = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  for (var i = 0; i < HL_PHRASES.length; i++) {
+    var ph = HL_PHRASES[i];
+    var esc = ph.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+    html = html.replace(new RegExp(esc, "g"), '<span class="hl">' + ph + '</span>');
+  }
+  return html;
+}
+
+// ============================================================
+// VOICE TAGS
+// ============================================================
+function getVoiceTags(answers) {
+  var toneMap = { natural:"Natural", professional:"Professional", conversational:"Warm", confident:"Confident" };
+  var useMap  = { work:"Polished", essay:"Precise", marketing:"Engaging", general:"Authentic" };
+  return [
+    "Clear",
+    toneMap[answers.q2] || "Natural",
+    useMap[answers.q1]  || "Authentic"
+  ];
+}
+
+// ============================================================
+// REFINED IMPROVEMENTS
+// ============================================================
+function getRefinedImprovements(answers) {
+  var toneDesc = { natural:"Sounds conversational and authentic", professional:"Clear, credible tone", conversational:"Warm and approachable", confident:"Direct and assertive" };
+  var strengthLabel = { light:"Light polish", balanced:"Balanced edits", strong:"Deeper rewrite" };
+  var strengthDesc  = { light:"Your structure is fully intact", balanced:"Core ideas preserved throughout", strong:"Clarity and flow maximized" };
+  return [
+    { text:"More natural phrasing",    sub:"Reduced robotic patterns" },
+    { text:"Meaning preserved",        sub:"Your ideas stay intact" },
+    { text:"Tone matched",             sub: toneDesc[answers.q2]     || "Sounds more like you" },
+    { text: strengthLabel[answers.q3] || "Balanced edits", sub: strengthDesc[answers.q3] || "Balanced" }
+  ];
+}
+
+// ============================================================
+// STATE
+// ============================================================
+var quizAnswers = {};
+var currentText = "";
+
+// ============================================================
+// SAMPLE CHIPS
+// ============================================================
+document.querySelectorAll(".chip[data-sample]").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    var key = btn.dataset.sample;
+    document.getElementById("inputText").value = SAMPLES[key];
+    document.getElementById("inputText").classList.remove("error");
+    document.querySelectorAll(".chip[data-sample]").forEach(function(b){ b.classList.remove("active"); });
+    btn.classList.add("active");
+    trackEvent("sample_text_clicked", { sample_used: key });
+  });
+});
+
+document.getElementById("inputText").addEventListener("input", function() {
+  this.classList.remove("error");
+  trackEvent("text_entered", { chars: this.value.length });
+}, { once: true });
+
+// ============================================================
+// PREVIEW BUTTON
+// ============================================================
+document.getElementById("previewBtn").addEventListener("click", function() {
+  var text = document.getElementById("inputText").value.trim();
+  if (!text) {
+    document.getElementById("inputText").classList.add("error");
+    document.getElementById("inputText").focus();
+    trackEvent("preview_blocked", { reason: "empty_input" });
+    return;
+  }
+
+  currentText = text;
+  quizAnswers = {};
+
+  trackEvent("preview_requested", {
+    chars: text.length,
+    chars_bucket: text.length < 200 ? "short" : text.length < 600 ? "medium" : "long"
+  });
+
+  // Fill initial before/after
+  var initial = generateRewrite(text, {});
+  document.getElementById("originalText").textContent = text;
+  document.getElementById("previewText").innerHTML = highlightHTML(initial);
+
+  // Reset quiz
+  document.querySelectorAll(".q-opt").forEach(function(o){ o.classList.remove("selected"); });
+  document.getElementById("q1").hidden = false;
+  document.getElementById("q2").hidden = true;
+  document.getElementById("q3").hidden = true;
+  document.getElementById("refinedSection").hidden = true;
+  document.getElementById("quizCard").hidden = false;
+
+  // Show preview section
+  var ps = document.getElementById("previewSection");
+  ps.hidden = false;
+  ps.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  trackEvent("preview_generated", { preview_visible_lines: 4 });
+  trackEvent("quiz_started");
+  trackEvent("quiz_step_viewed", { step: 1 });
+});
+
+// ============================================================
+// QUIZ
+// ============================================================
+document.querySelectorAll(".q-opt").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    var q   = parseInt(btn.dataset.q);
+    var val = btn.dataset.val;
+
+    document.querySelectorAll('.q-opt[data-q="' + q + '"]').forEach(function(b){ b.classList.remove("selected"); });
+    btn.classList.add("selected");
+    quizAnswers["q" + q] = val;
+
+    trackEvent("quiz_step_completed", { step: q, answer: val, quiz_answers: JSON.parse(JSON.stringify(quizAnswers)) });
+
+    if (q < 3) {
+      setTimeout(function() {
+        document.getElementById("q" + q).hidden = true;
+        document.getElementById("q" + (q + 1)).hidden = false;
+        trackEvent("quiz_step_viewed", { step: q + 1 });
+      }, 260);
+    } else {
+      setTimeout(showRefined, 260);
+    }
+  });
+});
+
+// ============================================================
+// SHOW REFINED PREVIEW
+// ============================================================
+function showRefined() {
+  var refined = generateRewrite(currentText, quizAnswers);
+
+  document.getElementById("refinedOriginal").textContent = currentText;
+  document.getElementById("refinedText").innerHTML = highlightHTML(refined);
+
+  // Dynamic improvements
+  var imps = getRefinedImprovements(quizAnswers);
+  document.getElementById("refinedImprovements").innerHTML = imps.map(function(i) {
+    return '<div class="imp-item"><span class="imp-check" aria-hidden="true">✓</span><div><div class="imp-text">' + i.text + '</div><div class="imp-sub">' + i.sub + '</div></div></div>';
+  }).join("");
+
+  // Voice profile
+  var tags = getVoiceTags(quizAnswers);
+  document.getElementById("voiceTags").innerHTML = tags.map(function(t) {
+    return '<span class="voice-tag">' + t + '</span>';
+  }).join("");
+
+  // Hide quiz, show refined
+  document.getElementById("quizCard").hidden = true;
+  var rs = document.getElementById("refinedSection");
+  rs.hidden = false;
+  rs.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  trackEvent("preview_refined",    { quiz_answers: JSON.parse(JSON.stringify(quizAnswers)) });
+  trackEvent("unlock_wall_viewed", { wall_type: "inline" });
+}
+
+// ============================================================
+// SIGNUP
+// ============================================================
+function handleSignup() {
+  trackEvent("unlock_cta_clicked", {
+    cta_copy: "Create free account to copy full rewrite",
+    wall_type: "inline",
+    quiz_answers: JSON.parse(JSON.stringify(quizAnswers))
+  });
+  trackEvent("signup_cta_clicked", { source: "inline_unlock_card" });
+  window.open("https://www.grammarly.com/signup", "_blank");
+}
+</script>
+
+</body>
+</html>

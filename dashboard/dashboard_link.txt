@@ -1,0 +1,55 @@
+## Dashboard link
+
+Replace the placeholder below once GitHub Pages is live:
+
+  https://arikshvarts.github.io/grammarly-growth-assignment/dashboard/dashboard.html
+
+Live LP link (same deployment):
+
+  https://arikshvarts.github.io/grammarly-growth-assignment/lp/improved_humanizer.html
+
+---
+
+## How to deploy with GitHub Pages (5 steps, ~5 minutes)
+
+1. Go to github.com → New repository
+   - Name: grammarly-growth-assignment (or similar)
+   - Visibility: Public
+   - Do not add a README (the project already has one)
+
+2. In this project folder (gg_v3), open a terminal and run:
+
+     git init
+     git add .
+     git commit -m "Initial submission — Grammarly AI Growth assignment"
+     git branch -M main
+     git remote add origin https://github.com/[your-username]/grammarly-growth-assignment.git
+     git push -u origin main
+
+3. On GitHub, go to your repo → Settings → Pages
+   - Source: Deploy from a branch
+   - Branch: main
+   - Folder: / (root)
+   - Click Save
+
+4. Wait ~60 seconds, then visit:
+     https://[your-username].github.io/grammarly-growth-assignment/dashboard/dashboard.html
+
+5. Paste both final URLs:
+   - Into this file (replacing the placeholders above)
+   - Into final/dashboard_summary.md (the dashboard reference line)
+   - Into final/optimization_plan.md (optional — mention the LP is live)
+
+---
+
+## Notes
+
+- The dashboard (dashboard/dashboard.html) requires internet for Chart.js CDN.
+  If the reviewer opens it offline, charts will not render. The CDN is
+  cdn.jsdelivr.net — highly reliable for interview demos.
+
+- Both HTML files are fully self-contained otherwise. No backend, no API keys,
+  no build step.
+
+- If the repo name contains uppercase letters, GitHub Pages URLs are
+  case-sensitive. Use all lowercase for the repo name to be safe.
