@@ -28,7 +28,7 @@ This is a completed home assignment submission for an AI Growth Specialist role 
 **Deliverables:**
 - `dashboard/data_cleaning.py` — Python pipeline producing 9 output CSVs
 - `dashboard/streamlit_app.py` — interactive multi-tab Streamlit dashboard
-- `dashboard/dashboard.html` — standalone static HTML fallback (Chart.js)
+- `dashboard/streamlit_app.py` — interactive Streamlit dashboard (deployed at above URL)
 - `final/dashboard_summary.md` — KPI explanation and dataset insights
 - `dashboard/metric_definitions.md` — metric formulas and attribution rules
 
@@ -54,8 +54,7 @@ This is a completed home assignment submission for an AI Growth Specialist role 
 ## Live links (pending Streamlit Cloud deployment)
 
 - LP (GitHub Pages): `https://arikshvarts.github.io/grammarly-growth-assignment/lp/improved_humanizer.html`
-- Static dashboard (GitHub Pages): `https://arikshvarts.github.io/grammarly-growth-assignment/dashboard/dashboard.html`
-- Streamlit dashboard: deploy at share.streamlit.io → `dashboard/streamlit_app.py`
+- Streamlit dashboard (live): `https://grammarly-growth-assignment-arik.streamlit.app/`
 
 ---
 
@@ -68,7 +67,7 @@ lp/
 dashboard/
   data_cleaning.py               ← Pipeline (run: python dashboard/data_cleaning.py)
   streamlit_app.py               ← Streamlit dashboard (run: streamlit run dashboard/streamlit_app.py)
-  dashboard.html                 ← Static HTML fallback
+  streamlit_app.py               ← Interactive dashboard (deployed)
   metric_definitions.md          ← KPI formulas and attribution rules
   grammarly_campaign_data.xlsx   ← Source dataset (gitignored)
   output/                        ← 9 output CSVs from data_cleaning.py

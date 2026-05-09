@@ -5,9 +5,9 @@
 | Deliverable | Link |
 |---|---|
 | **Improved LP — Variant B** | [arikshvarts.github.io/.../lp/improved_humanizer.html](https://arikshvarts.github.io/grammarly-growth-assignment/lp/improved_humanizer.html) |
-| **Campaign Performance Dashboard** | [arikshvarts.github.io/.../dashboard/dashboard.html](https://arikshvarts.github.io/grammarly-growth-assignment/dashboard/dashboard.html) |
+| **Campaign Performance Dashboard** | [grammarly-growth-assignment-arik.streamlit.app](https://grammarly-growth-assignment-arik.streamlit.app/) |
 
-> Both links are live via GitHub Pages. No login, no download, no setup required.
+> LP is live on GitHub Pages. Dashboard is a deployed Streamlit app — no login or download required.
 
 ---
 

@@ -83,9 +83,10 @@ Both LPs attracted nearly identical click volume throughout February (average ~5
 
 ## Dashboard structure
 
-**Live dashboard:**
-`https://arikshvarts.github.io/grammarly-growth-assignment/dashboard/dashboard.html`
-*(Replace with your GitHub Pages URL after deployment — see `dashboard/dashboard_link.txt` for steps.)*
+**Live dashboard (Streamlit):**
+`https://grammarly-growth-assignment-arik.streamlit.app/`
+
+Interactive filters: LP selector · cohort date range · rolling average toggle. Tabs: Overview · LP Funnel · Activation · Growth Actions · Methodology.
 
 1. **Executive Overview** — KPI cards for total users at each funnel stage, daily click/install/try trends by LP, overall Activation CVR
 2. **LP Funnel Diagnosis** — per-LP funnel metrics, Campaign Quality Score ranking, Traffic Quality Matrix (volume vs. activation CVR scatterplot)

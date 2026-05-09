@@ -348,6 +348,18 @@ with tabs[1]:
                       annotation_text=f"Median {med_y:.1%}", annotation_position="right")
         fig.add_vline(x=med_x, line_dash="dash", line_color="#94a3b8", line_width=1,
                       annotation_text="Median vol", annotation_position="top")
+        # Quadrant labels
+        for q_txt, q_x, q_y, q_ya in [
+            ("Low vol · High quality → Scale",    0.04, 0.97, "top"),
+            ("High vol · High quality → Scale",   0.54, 0.97, "top"),
+            ("Low vol · Low quality → Pause",     0.04, 0.03, "bottom"),
+            ("High vol · Low quality → Diagnose", 0.54, 0.03, "bottom"),
+        ]:
+            fig.add_annotation(
+                text=q_txt, x=q_x, y=q_y, xref="paper", yref="paper",
+                showarrow=False, font=dict(size=8, color="#94a3b8"),
+                xanchor="left", yanchor=q_ya,
+            )
         fig.update_traces(marker_size=18, textposition="top center")
         fig.update_layout(showlegend=False, plot_bgcolor="white",
                           yaxis_tickformat=".1%", hoverlabel=TOOLTIP_CFG,
