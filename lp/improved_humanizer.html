@@ -202,6 +202,13 @@
       text-decoration: none; transition: all .15s; margin-bottom: 10px;
     }
     .btn-unlock:hover { background: var(--accent-dk); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(20,164,108,.3); }
+    .btn-keep {
+      display: inline-block; width: 100%; max-width: 420px;
+      background: transparent; color: var(--accent); border: 2px solid var(--accent);
+      border-radius: 14px; padding: 12px 32px; font: 600 14px/1 inherit;
+      cursor: pointer; transition: all .15s; margin-bottom: 10px;
+    }
+    .btn-keep:hover { background: var(--accent-lt); }
     .unlock-micro { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
 
     /* ANYWHERE BRIDGE */
@@ -424,6 +431,7 @@
         <button class="btn-unlock" onclick="handleSignup()">
           Create free account to copy full rewrite
         </button>
+        <button class="btn-keep" onclick="handleKeepEditing()">Keep editing preview</button>
         <p class="unlock-micro">No credit card required.</p>
         <div class="anywhere-bridge">
           <p class="anywhere-title">Humanize and polish text anywhere you write</p>
@@ -446,6 +454,8 @@
 // ============================================================
 // EVENT TRACKING
 // ============================================================
+var pageLoadTs = Date.now();
+
 function trackEvent(name, props) {
   console.log("[trackEvent]", name, Object.assign({
     variant_id: "preview_first_v1",
@@ -676,7 +686,7 @@ document.getElementById("previewBtn").addEventListener("click", function() {
   ps.hidden = false;
   ps.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  trackEvent("preview_generated", { preview_visible_lines: 4 });
+  trackEvent("preview_generated", { preview_visible_lines: 4, time_to_preview_ms: Date.now() - pageLoadTs });
   trackEvent("quiz_started");
   trackEvent("quiz_step_viewed", { step: 1 });
 });
@@ -736,6 +746,15 @@ function showRefined() {
 
   trackEvent("preview_refined",    { quiz_answers: JSON.parse(JSON.stringify(quizAnswers)) });
   trackEvent("unlock_wall_viewed", { wall_type: "inline" });
+}
+
+// ============================================================
+// KEEP EDITING
+// ============================================================
+function handleKeepEditing() {
+  trackEvent("unlock_wall_dismissed", { wall_type: "inline" });
+  var target = document.getElementById("initialPreviewCard") || document.getElementById("previewSection");
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // ============================================================
