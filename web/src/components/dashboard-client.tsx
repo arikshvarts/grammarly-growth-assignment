@@ -453,6 +453,8 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
   // Initialize date range once data loads
   React.useEffect(() => { setDateRange([dateMin, dateMax]); }, [dateMin, dateMax]);
 
+  const daysSelected = useMemo(() => Math.round((new Date(dateRange[1]).getTime() - new Date(dateRange[0]).getTime()) / 86400000) + 1, [dateRange]);
+  const periodLabel = `${dateRange[0]} – ${dateRange[1]}`;
   const allLps = ['lp_academic_writing', 'lp_business_emails'];
 
   // Filter user funnel
@@ -572,8 +574,6 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
     return { notInst, instNoTry, tryNoRepeat, total: notInst + instNoTry + tryNoRepeat };
   }, [totals]);
 
-  const periodLabel = `${dateRange[0]} – ${dateRange[1]}`;
-  const daysSelected = Math.round((new Date(dateRange[1]).getTime() - new Date(dateRange[0]).getTime()) / 86400000) + 1;
 
   const TABS = ['Overview', 'LP Funnel', 'Feature Activation', 'Growth Actions', 'Methodology'];
   // ── Cohort line series ───────────────────────────────────────────────────────
