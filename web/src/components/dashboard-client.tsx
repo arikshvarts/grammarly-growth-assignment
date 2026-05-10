@@ -671,24 +671,6 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
             </button>
           </div>
 
-          <div className="space-y-2 pt-4 border-t border-[#dde4e1]">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" checked={showRolling} onChange={e => { setShowRolling(e.target.checked); if(e.target.checked) setIsCumulative(false); }} className="accent-[#14a46c]" />
-              <span className="text-xs text-[#4a5f56] group-hover:text-[#14a46c] transition-colors">7-day rolling avg</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" checked={isCumulative} onChange={e => { setIsCumulative(e.target.checked); if(e.target.checked) setShowRolling(false); }} className="accent-[#14a46c]" />
-              <span className="text-xs text-[#4a5f56] group-hover:text-[#14a46c] transition-colors">Cumulative view</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" checked={showWeekends} onChange={e => setShowWeekends(e.target.checked)} className="accent-[#14a46c]" />
-              <span className="text-xs text-[#4a5f56] group-hover:text-[#14a46c] transition-colors">Highlight weekends</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" checked={isBenchmark} onChange={e => setIsBenchmark(e.target.checked)} className="accent-[#14a46c]" />
-              <span className="text-xs text-[#4a5f56] group-hover:text-[#14a46c] transition-colors">Benchmark mode</span>
-            </label>
-          </div>
 
           <div className="space-y-1.5 pt-4 border-t border-[#dde4e1]">
             <div className="text-[10px] text-[#6a8074]"><strong className="text-[#16201b]">Grain:</strong> user-level</div>
@@ -718,7 +700,13 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
           {/* ── TAB 0: OVERVIEW ──────────────────────────────────────── */}
           {activeTab === 0 && (
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-[#1b2333]">Campaign KPIs : {periodLabel}</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-[#1b2333]">Campaign KPIs : {periodLabel}</h2>
+                <label className="flex items-center gap-2 cursor-pointer group bg-white border border-[#dde4e1] px-3 py-1.5 rounded-xl shadow-sm hover:border-[#14a46c] transition-all">
+                  <input type="checkbox" checked={isBenchmark} onChange={e => setIsBenchmark(e.target.checked)} className="accent-[#14a46c]" />
+                  <span className="text-[10px] font-bold text-[#4a5f56] group-hover:text-[#14a46c] uppercase tracking-wider">Benchmark Mode</span>
+                </label>
+              </div>
               <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
                 <KpiCard label="LP CTA Click Users" value={num(totals.clicks)} sub="Install-button clicks, not page renders" tip={KPI_TOOLTIPS['LP CTA Click Users']} />
                 <KpiCard label="Install Users" value={num(totals.installs)} sub={`${pct(totals.installCvr)} Install CVR`} highlight 
@@ -794,6 +782,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                 </div>
               )}
 
+
               {/* Daily volume line chart */}
               <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
@@ -803,17 +792,33 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                       {dailyViewType === 'pct' ? 'Daily conversion rate vs LP clicks' : 'Unique users per action per day'}
                     </div>
                   </div>
-                  <div className="flex bg-[#f1f5f9] p-1 rounded-lg">
-                    <button 
-                      onClick={() => setDailyViewType('num')}
-                      className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${dailyViewType === 'num' ? 'bg-white text-[#14a46c] shadow-sm' : 'text-[#5f6b7a] hover:text-[#1b2333]'}`}>
-                      ABS
-                    </button>
-                    <button 
-                      onClick={() => setDailyViewType('pct')}
-                      className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${dailyViewType === 'pct' ? 'bg-white text-[#14a46c] shadow-sm' : 'text-[#5f6b7a] hover:text-[#1b2333]'}`}>
-                      % CVR
-                    </button>
+                  <div className="flex items-center gap-2">
+                    <div className="flex bg-[#f1f5f9] p-1 rounded-lg">
+                      <button 
+                        onClick={() => setDailyViewType('num')}
+                        className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${dailyViewType === 'num' ? 'bg-white text-[#14a46c] shadow-sm' : 'text-[#5f6b7a] hover:text-[#1b2333]'}`}>
+                        ABS
+                      </button>
+                      <button 
+                        onClick={() => setDailyViewType('pct')}
+                        className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${dailyViewType === 'pct' ? 'bg-white text-[#14a46c] shadow-sm' : 'text-[#5f6b7a] hover:text-[#1b2333]'}`}>
+                        % CVR
+                      </button>
+                    </div>
+                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
+                      <input type="checkbox" checked={showRolling} onChange={e => { setShowRolling(e.target.checked); if(e.target.checked) setIsCumulative(false); }} className="accent-[#14a46c]" />
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Rolling</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
+                      <input type="checkbox" checked={showWeekends} onChange={e => setShowWeekends(e.target.checked)} className="accent-[#14a46c]" />
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Weekends</span>
+                    </label>
+                    {dailyViewType === 'num' && (
+                      <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
+                        <input type="checkbox" checked={isCumulative} onChange={e => { setIsCumulative(e.target.checked); if(e.target.checked) setShowRolling(false); }} className="accent-[#14a46c]" />
+                        <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Cumulative</span>
+                      </label>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-4 text-xs mb-3">
@@ -899,9 +904,23 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
 
               {/* Cohort CVR over time */}
               <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
-                <div className="text-sm font-bold text-[#1b2333] mb-1">Cohort Activation CVR Over Time</div>
-                <div className="text-xs text-[#5f6b7a] mb-4">
-                  Daily cohort CVR · Last 2–3 days may read low as attribution windows extend past the dataset
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="text-sm font-bold text-[#1b2333] mb-1">Cohort Activation CVR Over Time</div>
+                    <div className="text-xs text-[#5f6b7a]">
+                      Daily cohort CVR · Last 2–3 days may read low as attribution windows extend past the dataset
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
+                      <input type="checkbox" checked={showRolling} onChange={e => setShowRolling(e.target.checked)} className="accent-[#14a46c]" />
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Rolling</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
+                      <input type="checkbox" checked={showWeekends} onChange={e => setShowWeekends(e.target.checked)} className="accent-[#14a46c]" />
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Weekends</span>
+                    </label>
+                  </div>
                 </div>
                 <div className="flex gap-4 text-xs mb-3">
                   {cohortSeries.map(s => (
