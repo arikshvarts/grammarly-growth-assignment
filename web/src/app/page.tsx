@@ -361,7 +361,7 @@ export default function LandingPage() {
             <div className="relative grid grid-cols-12 gap-8 h-full p-8 md:p-12">
               <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
               
-              <div className={`col-span-12 ${step === 0 ? 'lg:col-span-7' : 'lg:col-span-12 text-center'} relative z-10 flex flex-col justify-center gap-6`}>
+              <div className={`col-span-12 ${step === 0 ? 'lg:col-span-6' : 'lg:col-span-12 text-center'} relative z-10 flex flex-col justify-center gap-6`}>
                 {step === 0 ? (
                   <>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight">
@@ -426,10 +426,10 @@ export default function LandingPage() {
               </div>
 
               {step === 0 && (
-                <div className="col-span-12 lg:col-span-5 relative hidden lg:flex flex-col items-center justify-center lg:translate-x-12 overflow-visible">
+                <div className="col-span-12 lg:col-span-6 relative hidden lg:flex flex-col items-center justify-center lg:-ml-12 overflow-visible">
                   <SplineScene
                     scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                    className="w-full h-full min-h-[400px]"
+                    className="w-full h-full min-h-[450px]"
                   />
                   <div className="absolute bottom-10 right-0 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-xs font-medium text-white/80 flex items-center gap-2" aria-hidden="true">
                     <Sparkles className="w-4 h-4 text-accent" />
