@@ -703,7 +703,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
           <div className="bg-white rounded-xl border border-[#dde4e1] px-4 py-2.5 flex flex-wrap gap-4 text-xs text-[#5f6b7a]">
             <span><strong className="text-[#1b2333]">Period:</strong> {periodLabel} ({daysSelected} days)</span>
             <span><strong className="text-[#1b2333]">LPs:</strong> {selectedLps.map(l => LP_MAP[l]).join(' · ')}</span>
-            <span><strong className="text-[#1b2333]">Users:</strong> {num(totals.clicks)} LP CTA clickers</span>
+            <span><strong className="text-[#1b2333]">Users:</strong> {num(totals.current.clicks)} LP CTA clickers</span>
           </div>
 
           {/* Tabs */}
@@ -805,7 +805,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                     <strong>{pct(botLp.actCvr)}</strong> for {botLp.name}.
                   </div>
                   <div className="bg-[#fdf2e9] border border-[#f5c7a0] rounded-xl p-4 text-sm text-[#1b2333]">
-                    <strong>{pct(totals.deadRate)} shared dead install rate.</strong>
+                    <strong>{pct(totals.current.deadRate)} shared dead install rate.</strong>
                     This is a post-install onboarding problem, not an LP acquisition problem.
                   </div>
                   {topLp && botLp && botLp.actCvr > 0 && (
@@ -1174,7 +1174,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                     </div>
                   ))}
                   <div className="mt-4">
-                    <FountainVis total={totals.clicks} installs={totals.installs} tries={totals.tries} repeat={totals.repeatUsers} />
+                    <FountainVis total={totals.current.clicks} installs={totals.current.installs} tries={totals.current.tries} repeat={totals.current.repeatUsers} />
                   </div>
                 </div>
               </div>
