@@ -4,6 +4,14 @@ __pycache__/
 .DS_Store
 node_modules/
 *.log
+.next/
+web/.next/
+web/out/
+web/.vercel/
+.tmp/
+.claude/skills/
+design-system/
+.streamlit/secrets.toml
 dashboard/grammarly_campaign_data.xlsx
 dashboard/grammarly_campaign_data.csv
 # output CSVs are included as submission deliverables

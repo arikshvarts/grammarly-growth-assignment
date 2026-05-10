@@ -5,7 +5,26 @@
       "Bash(Select-Object Length)",
       "Bash(python dashboard/data_cleaning.py)",
       "Bash(pip install *)",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(git branch *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(pip show *)",
+      "Bash(python -c \"import streamlit; print\\('streamlit import OK'\\)\")",
+      "Bash(python *)",
+      "Bash(start streamlit *)",
+      "Bash(ping -n 5 127.0.0.1)",
+      "Bash(curl -s http://localhost:8501/_stcore/health)",
+      "WebSearch",
+      "WebFetch(domain:grammarly-growth-assignment-arik.streamlit.app)",
+      "Bash(git rm *)",
+      "Skill(claude-api)",
+      "WebFetch(domain:arikshvarts.github.io)",
+      "Bash(powershell *)",
+      "Bash(git commit -m 'lp: platform pills become real clickable links \\(browser extension + native apps URLs\\) *)",
+      "Bash(git commit -m 'polish: page icons, data timestamp in dashboard sidebar *)"
     ]
   }
 }

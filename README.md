@@ -1,30 +1,36 @@
-# Grammarly AI Growth Specialist — Home Assignment
+# Grammarly AI Growth Specialist : Home Assignment
 
-## Live deliverables
+## Project Status: ✅ Complete
 
-| Deliverable | Link |
-|---|---|
-| **Improved LP — Variant B** | [arikshvarts.github.io/.../lp/improved_humanizer.html](https://arikshvarts.github.io/grammarly-growth-assignment/lp/improved_humanizer.html) |
-| **Campaign Performance Dashboard** | [arikshvarts.github.io/.../dashboard/dashboard.html](https://arikshvarts.github.io/grammarly-growth-assignment/dashboard/dashboard.html) |
+A full-stack growth assignment solution with a **preview-first landing page** and **campaign analytics dashboard** built with Next.js, React, and TypeScript.
 
-> Both links are live via GitHub Pages. No login, no download, no setup required.
+---
+
+## Quick Start
+
+```bash
+# Install and run
+cd web && npm install
+ANTHROPIC_API_KEY=your_key_here npm run dev
+
+# Then visit:
+# - http://localhost:3000 (Landing Page)
+# - http://localhost:3000/dashboard (Analytics Dashboard)
+```
 
 ---
 
 ## What I built
 
-### Mission 1 — LP Conversion Optimization
+### Mission 1 : LP Conversion Optimization
 
 Redesigned the AI Humanizer landing page from a quiz-first funnel into a **preview-first personalization flow**.
 
-**The problem:** The original LP loses 40% of users between Q1 and Q2 — not because the questions are bad, but because users arrive expecting an instant tool and get a long survey before seeing any output. The hard modal at the end converts only 23.5% of users who reach it.
+**The problem:** The original LP loses 40% of users between Q1 and Q2 : not because the questions are bad, but because users arrive expecting an instant tool and get a long survey before seeing any output. The hard modal at the end converts only 30.7% of users who reach it.
 
-**The solution — Variant B:**
+**The solution : Variant B:**
 
-```
-Paste text → visible before/after preview → 3-question personalization quiz
-→ refined preview + voice profile → inline unlock card
-```
+The solution consists of a "Paste-first" hero where users input text, see an immediate before-and-after preview, complete a 3-question personalization quiz, and receive a refined output leading to an inline unlock card.
 
 Key changes: paste box before any question, 8 questions → 3, partial preview before signup, inline unlock card replacing the hard modal, brand-safe copy throughout (no detector-evasion claims, no fake AI scores).
 
@@ -32,9 +38,9 @@ Key changes: paste box before any question, 8 questions → 3, partial preview b
 
 ---
 
-### Mission 2 — Campaign Performance Dashboard
+### Mission 2 : Campaign Performance Dashboard
 
-Built a user-level campaign analytics pipeline measuring **Qualified Activated Users** — users who clicked the LP CTA, installed Grammarly, and triggered `try_grammarly` within a 7-day attribution window.
+Built a user-level campaign analytics pipeline measuring **Qualified Activated Users** : users who clicked the LP CTA, installed Grammarly, and triggered `try_grammarly` within a 7-day attribution window.
 
 **Dataset:** 3,200 users · 2 LPs · February 2026 · first-touch attribution
 
@@ -47,7 +53,7 @@ Built a user-level campaign analytics pipeline measuring **Qualified Activated U
 | Dead Install Rate | 43.0% | 50.6% |
 | Campaign Quality Score | **1.00** | 0.87 |
 
-The 4.1pp activation gap is consistent across all 28 cohort days. The repeat try rate gap (75% vs 12%) is the largest signal — academic users return; business users try once and stop. The shared highest-leverage fix is the 43–51% dead install rate, which is downstream of the LP and sits in the post-install onboarding experience.
+The 4.1pp activation gap is consistent across all 28 cohort days. The repeat try rate gap (75% vs 12%) is the largest signal : academic users return; business users try once and stop. The shared highest-leverage fix is the 43–51% dead install rate, which is downstream of the LP and sits in the post-install onboarding experience.
 
 → See full analysis: [`final/dashboard_summary.md`](final/dashboard_summary.md)
 → Data pipeline: [`dashboard/data_cleaning.py`](dashboard/data_cleaning.py)
@@ -60,54 +66,65 @@ The 4.1pp activation gap is consistent across all 28 cohort days. The repeat try
 ```
 grammarly-growth-assignment/
 │
-├── lp/
-│   └── improved_humanizer.html        ← Variant B LP (live)
+├── web/                               ← Next.js + React + TypeScript app
+│   ├── src/app/page.tsx              ← Mission 1 Landing Page
+│   ├── src/app/dashboard/page.tsx    ← Mission 2 Analytics Dashboard
+│   ├── src/app/api/rewrite/route.ts  ← Anthropic API (Claude Haiku 4.5)
+│   └── src/components/               ← React components
 │
 ├── dashboard/
-│   ├── dashboard.html                 ← Campaign dashboard (live)
-│   ├── data_cleaning.py               ← Python pipeline (runs locally)
-│   ├── metric_definitions.md          ← KPI definitions and attribution rules
-│   ├── grammarly_campaign_data.xlsx   ← Source dataset
-│   └── output/                        ← 9 pipeline output CSVs
-│       ├── user_funnel.csv
-│       ├── lp_funnel_metrics.csv
-│       ├── feature_metrics.csv
-│       ├── daily_event_metrics.csv
-│       ├── cohort_metrics.csv
-│       ├── growth_actions.csv
-│       ├── qa_summary.csv
-│       └── ...
+│   ├── data_cleaning.py              ← Python data pipeline (CSVs → metrics)
+│   ├── metric_definitions.md         ← KPI definitions and attribution rules
+│   ├── grammarly_campaign_data.xlsx  ← Source dataset (mock, Feb 2026)
+│   └── output/                       ← 9 pipeline output CSVs
 │
-├── final/
-│   ├── optimization_plan.md           ← Mission 1 diagnosis + strategy
-│   └── dashboard_summary.md          ← Mission 2 KPIs + insights
-│
-├── docs/
-│   ├── assignment_brief.md
-│   ├── mission_1_lp_conversion_ideas.md
-│   └── mission_2_dashboard_ideas.md
-│
-└── original/
-    └── humanizer_original.html        ← Original LP (control)
+└── final/
+    ├── optimization_plan.md          ← Mission 1 full strategy
+    ├── dashboard_summary.md          ← Mission 2 full analysis
+    ├── event_tracking_spec.md        ← LP event tracking schema
+    └── submission_checklist.md       ← Final verification list
 ```
 
 ---
 
-## Run the data pipeline locally
+## UI/UX Enhancements
 
-```bash
-pip install -r requirements.txt
-python dashboard/data_cleaning.py
-```
+### Landing Page
+- **Preview-first flow** : users see before/after immediately after pasting text
+- **Light rewrites** : predefined examples change only 4-10 words to show quality
+- **Adaptive personalization** : system prompts adjust based on rewrite strength (light/balanced/strong)
+- **Responsive design** : works on mobile and desktop with accessible contrast
 
-Outputs 9 CSVs to `dashboard/output/`. The dashboard HTML reads embedded data from those outputs — no live database connection required.
+### Analytics Dashboard
+- **Interactive KPI cards** : hover states with shadow lift and color transitions
+- **Color filtering** : click LP color dots to toggle filter (44×44px touch targets per WCAG guidelines)
+- **Number tooltips** : all metrics show detailed explanations on hover
+- **Bar chart highlighting** : hover to see exact values and compare metrics
+- **Responsive dashboard** : works on all screen sizes
+
+---
+
+## API & Data
+
+**Rewrite API:** `/api/rewrite` calls Claude Haiku 4.5 with dynamic system prompts based on:
+- Use case (work, essay, marketing, general)
+- Tone preference (natural, professional, conversational, confident)
+- Rewrite strength (light, balanced, strong)
+
+**Data Pipeline:** `python dashboard/data_cleaning.py` produces 9 CSVs:
+- `user_funnel.csv` : user-level funnel data
+- `cohort_metrics.csv` : activation metrics by LP and cohort date
+- `daily_event_metrics.csv` : daily event volumes
+- `feature_metrics.csv` : first product feature alignment
+- And more...
 
 ---
 
 ## Design decisions worth noting
 
-**LP:** Kept quiz format as required, but changed the quiz's role from friction gate to personalization layer. Value (preview) comes before commitment (quiz + signup). Inline unlock card replaces hard modal — user sees proof before the wall, not a blurred promise.
+**LP:** Preview comes before quiz. 8 questions → 3. Inline unlock card (not hard modal). Brand-safe copy (no detector-evasion claims, no fake AI scores).
 
-**Dashboard:** Chose user-level metrics over raw event counts to avoid inflating numbers. `did_click_lp` is treated as install-button click, not page render. Attribution anchors on the user's first LP CTA click. CAC, ROAS, LTV, and page-render CVR are explicitly excluded — the dataset does not support them.
+**Dashboard:** User-level metrics, not raw events. First-touch attribution, 7-day window. `did_click_lp` = install-button click (not page render). No CAC/ROAS/LTV claims : dataset doesn't support them.
 
-**What's not built (and why):** No real LLM API calls, no auth, no backend. A polished standalone LP + correct analytics logic + honest writeups communicates the growth thinking more clearly than an overbuilt app.
+**Why Next.js:** Modern React app with API routes, easy deployment to Vercel, hot module reloading for rapid iteration, built-in optimization and TypeScript support.
+

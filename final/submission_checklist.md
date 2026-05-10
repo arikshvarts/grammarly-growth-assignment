@@ -2,33 +2,34 @@
 
 ## Mission 1
 
-- [ ] `lp/improved_humanizer.html` opens locally.
-- [ ] LP is still in quiz format.
-- [ ] Paste box appears before or early in the quiz.
-- [ ] User sees visible preview before signup.
-- [ ] Quiz has 3 core questions.
-- [ ] Inline unlock card exists.
-- [ ] No detector-evasion claims.
-- [ ] Event tracking stubs exist.
-- [ ] `final/optimization_plan.md` is concise and decisive.
-- [ ] Market research/citations are included in the final optimization plan.
+- [x] Next.js Landing Page (root `/`) is fully functional.
+- [x] LP is still in quiz format (streamlined to 3 questions).
+- [x] Paste box appears at the very beginning (Paste-first Hero).
+- [x] User sees visible preview before signup.
+- [x] Quiz has 3 core questions.
+- [x] Inline unlock card and Writing Profile card exist.
+- [x] No detector-evasion claims.
+- [x] Event tracking stubs exist.
+- [x] `final/optimization_plan.md` is concise and decisive.
+- [x] Market research/citations are included in the final optimization plan.
 
 ## Mission 2
 
-- [ ] Dataset placed in `dashboard/`.
-- [ ] `dashboard/data_cleaning.py` runs successfully.
-- [ ] Output CSVs created under `dashboard/output/`.
-- [ ] Metrics use user-level sequence logic.
-- [ ] `did_click_lp` is treated as LP CTA click, not page render.
-- [ ] 7-day attribution window is stated.
-- [ ] Dashboard/report includes actual dataset insights.
-- [ ] Data limitations are stated.
-- [ ] Dashboard link or screenshots are included.
+- [x] Dataset placed in `dashboard/`.
+- [x] `dashboard/data_cleaning.py` runs successfully.
+- [x] Output CSVs created under `web/public/data/` for deployment.
+- [x] Metrics use user-level sequence logic.
+- [x] `did_click_lp` is treated as LP CTA click, not page render.
+- [x] 7-day attribution window is stated.
+- [x] Dashboard/report includes actual dataset insights.
+- [x] Data limitations are stated.
+- [x] Live Dashboard link available at `/dashboard`.
 
 ## Final package
 
-- [ ] Include improved HTML.
-- [ ] Include optimization plan.
-- [ ] Include dashboard link or screenshots/report.
-- [ ] Include dashboard summary.
-- [ ] Include event tracking spec if useful.
+- [x] Include Next.js source code.
+- [x] Include optimization plan.
+- [x] Live Deployment URL: [https://web-tau-six-48.vercel.app/](https://web-tau-six-48.vercel.app/)
+- [x] Include dashboard summary.
+- [x] Include event tracking spec.
+- [x] Commit all changes to Git.

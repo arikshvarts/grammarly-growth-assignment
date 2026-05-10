@@ -1,53 +1,48 @@
-# Metric Definitions — Mission 2
+# Metric Definitions & Attribution Logic
 
-## Grain and attribution
+## Funnel Rigor
 
-All funnel metrics should be calculated at the **user level**, not raw event level, to avoid overcounting repeated clicks, installs, or feature tries.
+All metrics are calculated at the **user level** (Distinct User IDs), not raw event level, to avoid overcounting. A user is only counted as "Activated" if they complete the full funnel in chronological order within a 7-day window.
 
-For each user, use:
+**Attribution Rule:** First-touch LP attribution. The LP name from the user's first `did_click_lp` event is used as the cohort anchor.
 
-1. First LP CTA click timestamp.
-2. First install timestamp after that LP CTA click.
-3. First `try_grammarly` timestamp after install.
+---
 
-A user is counted as activated only if events happen in sequence:
+## Core Formulas
 
-```text
-LP CTA click → install → try_grammarly
-```
+| KPI | Formula | Why it matters |
+|---|---|---|
+| **LP CTA Click Users** | `COUNTD(user_id)` where action = `did_click_lp` | Entry point of the post-click campaign funnel. |
+| **Install CVR** | `Install Users / LP CTA Click Users` | Measures acquisition quality and install-bridge friction. |
+| **Activation CVR** | `Qualified Activated / LP CTA Click Users` | North Star metric: end-to-end campaign quality. |
+| **Install → Try Rate** | `Qualified Activated / Install Users` | Isolates onboarding success from LP quality. |
+| **Dead Install Rate** | `(Install Users − Activated) / Install Users` | Identifies users who abandoned after the hard step (install). |
+| **Repeat Try Rate** | `Users with 2+ try events / Users with 1+ try` | Measures initial habit formation and utility. |
 
-## Attribution rule
+---
 
-For the main dashboard, attribute each user to their **first LP CTA click** within the selected date range.
+## Technical Considerations
 
-Count install and try events only if they occur:
-- after that click,
-- in the correct order,
-- within the 7-day attribution window.
+### 1. Cohort-Based Calculations
+Daily conversion rates in the dashboard are **cohort-anchored** on the user's first LP CTA click date. This ensures that a "20% Activation CVR" on Monday truly represents 20% of Monday's clickers, regardless of whether they installed/tried on Tuesday or Wednesday.
 
-If a user clicks multiple LP CTAs, use first-touch attribution for the executive view. In production, compare this with last-touch attribution in deeper analysis.
+### 2. Attribution Window
+The window is set to **7 days**.
+*   Any install after day 7 is counted as "unattributed" in production (not in this dashboard).
+*   Any `try_grammarly` after day 7 is excluded from the Activation CVR calculation.
 
-## Date views
+### 3. Right-Censoring
+To avoid artificially low conversion rates for recent dates, the latest 7 days in the dashboard are marked as "incomplete" or excluded from finalized cohort totals.
 
-Use both event-date and cohort-date views:
+### 4. Definition of "Repeat"
+"Repeat Try Rate" specifically measures users who triggered the `try_grammarly` event two or more times within the 7-day window. This is used as a proxy for product-market fit for that specific landing page's audience.
 
-- **Event-date view:** useful for daily monitoring of event volume.
-- **Cohort-date view:** groups users by first LP CTA click date and measures later installs/tries within a fixed window.
+---
 
-## Core KPIs
+## Limitations (Mission 2 Constraints)
 
-| KPI | Definition |
-|---|---|
-| LP CTA Click Users | Distinct users with `did_click_lp` |
-| Install Users | Distinct users with install after LP CTA click within window |
-| Try Users | Distinct users with try after install within window |
-| Install CVR | Install Users / LP CTA Click Users |
-| Install → Try Rate | Try Users / Install Users |
-| Activation CVR | Try Users / LP CTA Click Users |
-| Dead Install Rate | Installed users who did not try / Install Users |
-| Activation Yield | Qualified Activated Users per 100 LP CTA Click Users |
-| Repeat Try Rate | Users with 2+ try events / users with 1+ try events |
-
-## Limitations
-
-Do not calculate CAC, ROAS, LTV, payback, page-render CVR, or ad CTR unless spend, revenue, page render, and impression fields are added.
+The following metrics **cannot** be calculated from the provided dataset:
+*   **CAC / ROAS / LTV:** Requires ad spend and subscription revenue data.
+*   **Ad CTR:** Requires impression data from the ad platform.
+*   **Page-render CVR:** Requires a separate `page_render` event.
+*   **Funnel Step Completion:** Requires granular instrumentation for each onboarding step.
