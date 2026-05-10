@@ -704,7 +704,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                 <h2 className="text-lg font-bold text-[#1b2333]">Campaign KPIs : {periodLabel}</h2>
                 <label className="flex items-center gap-2 cursor-pointer group bg-white border border-[#dde4e1] px-3 py-1.5 rounded-xl shadow-sm hover:border-[#14a46c] transition-all">
                   <input type="checkbox" checked={isBenchmark} onChange={e => setIsBenchmark(e.target.checked)} className="accent-[#14a46c]" />
-                  <span className="text-[10px] font-bold text-[#4a5f56] group-hover:text-[#14a46c] uppercase tracking-wider">Benchmark Mode</span>
+                  <span className="text-[10px] font-bold text-[#4a5f56] group-hover:text-[#14a46c] uppercase tracking-wider">Compare LP Lift</span>
                 </label>
               </div>
               <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
@@ -805,9 +805,9 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                         % CVR
                       </button>
                     </div>
-                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
+                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors" title="7-day rolling average to smooth daily noise">
                       <input type="checkbox" checked={showRolling} onChange={e => { setShowRolling(e.target.checked); if(e.target.checked) setIsCumulative(false); }} className="accent-[#14a46c]" />
-                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Rolling</span>
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Weekly Smooth</span>
                     </label>
                     <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
                       <input type="checkbox" checked={showWeekends} onChange={e => setShowWeekends(e.target.checked)} className="accent-[#14a46c]" />
@@ -912,9 +912,9 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
+                    <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors" title="7-day rolling average to smooth daily noise">
                       <input type="checkbox" checked={showRolling} onChange={e => setShowRolling(e.target.checked)} className="accent-[#14a46c]" />
-                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Rolling</span>
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Weekly Smooth</span>
                     </label>
                     <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
                       <input type="checkbox" checked={showWeekends} onChange={e => setShowWeekends(e.target.checked)} className="accent-[#14a46c]" />
