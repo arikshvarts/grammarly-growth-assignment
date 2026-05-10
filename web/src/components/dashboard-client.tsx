@@ -568,9 +568,9 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
 
   // Wasted acquisition
   const wasted = useMemo(() => {
-    const notInst = Math.max(totals.clicks - totals.installs, 0);
-    const instNoTry = Math.max(totals.installs - totals.tries, 0);
-    const tryNoRepeat = Math.max(totals.tries - totals.repeatUsers, 0);
+    const notInst = Math.max(totals.current.clicks - totals.current.installs, 0);
+    const instNoTry = Math.max(totals.current.installs - totals.current.tries, 0);
+    const tryNoRepeat = Math.max(totals.current.tries - totals.current.repeatUsers, 0);
     return { notInst, instNoTry, tryNoRepeat, total: notInst + instNoTry + tryNoRepeat };
   }, [totals]);
 
