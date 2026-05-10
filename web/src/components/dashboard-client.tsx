@@ -432,7 +432,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
   const [showRolling, setShowRolling] = useState(false);
   const [isCumulative, setIsCumulative] = useState(false);
   const [showWeekends, setShowWeekends] = useState(false);
-  const [isBenchmark, setIsBenchmark] = useState(false);
+  const [comparisonMode, setComparisonMode] = useState<'none' | 'variant' | 'period'>('none');
   const [dailyViewType, setDailyViewType] = useState<'num' | 'pct'>('num');
   const [selectedLps, setSelectedLps] = useState<string[]>(['lp_academic_writing', 'lp_business_emails']);
   const [dateRange, setDateRange] = useState<[string, string]>(['2026-02-01', '2026-02-28']);
@@ -464,19 +464,37 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
 
   // Aggregate totals
   const totals = useMemo(() => {
-    const clicks = new Set(ufFiltered.map(r => r.user_id)).size;
-    const installs = ufFiltered.filter(r => csvBool(r.installed_after_click)).length;
-    const tries = ufFiltered.filter(r => csvBool(r.tried_after_install)).length;
-    const repeatUsers = ufFiltered.filter(r => csvBool(r.is_repeat_try_user)).length;
-    return {
-      clicks, installs, tries, repeatUsers,
-      installCvr: clicks > 0 ? installs / clicks : 0,
-      actCvr: clicks > 0 ? tries / clicks : 0,
-      deadRate: installs > 0 ? (installs - tries) / installs : 0,
-      installToTry: installs > 0 ? tries / installs : 0,
-      repeatRate: tries > 0 ? repeatUsers / tries : 0,
+    const calc = (data: UserFunnel[]) => {
+      const clicks = new Set(data.map(r => r.user_id)).size;
+      const installs = data.filter(r => csvBool(r.installed_after_click)).length;
+      const tries = data.filter(r => csvBool(r.tried_after_install)).length;
+      const repeatUsers = data.filter(r => csvBool(r.is_repeat_try_user)).length;
+      return {
+        clicks, installs, tries, repeatUsers,
+        installCvr: clicks > 0 ? installs / clicks : 0,
+        actCvr: clicks > 0 ? tries / clicks : 0,
+        deadRate: installs > 0 ? (installs - tries) / installs : 0,
+        installToTry: installs > 0 ? tries / installs : 0,
+        repeatRate: tries > 0 ? repeatUsers / tries : 0,
+      };
     };
-  }, [ufFiltered]);
+
+    const durationMs = new Date(dateRange[1]).getTime() - new Date(dateRange[0]).getTime() + 86400000;
+    const prevEndStr = new Date(new Date(dateRange[0]).getTime() - 86400000).toISOString().slice(0,10);
+    const prevStartStr = new Date(new Date(dateRange[0]).getTime() - durationMs).toISOString().slice(0,10);
+
+    const prevFiltered = uf.filter(r =>
+      selectedLps.includes(r.attributed_lp_name) &&
+      r.cohort_date.slice(0, 10) >= prevStartStr &&
+      r.cohort_date.slice(0, 10) <= prevEndStr
+    );
+
+    return {
+      current: calc(ufFiltered),
+      prev: calc(prevFiltered),
+      isWeekly: daysSelected === 7
+    };
+  }, [ufFiltered, uf, dateRange, selectedLps, daysSelected]);
 
   // Per-LP metrics
   const lpMetrics = useMemo(() => allLps.filter(lp => selectedLps.includes(lp)).map(lp => {
@@ -702,43 +720,63 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-[#1b2333]">Campaign KPIs : {periodLabel}</h2>
-                <label className="flex items-center gap-2 cursor-pointer group bg-white border border-[#dde4e1] px-3 py-1.5 rounded-xl shadow-sm hover:border-[#14a46c] transition-all">
-                  <input type="checkbox" checked={isBenchmark} onChange={e => setIsBenchmark(e.target.checked)} className="accent-[#14a46c]" />
-                  <span className="text-[10px] font-bold text-[#4a5f56] group-hover:text-[#14a46c] uppercase tracking-wider">Compare LP Lift</span>
-                </label>
+                <div className="flex bg-[#f1f5f9] p-1 rounded-xl gap-1">
+                  <button onClick={() => setComparisonMode('none')} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all ${comparisonMode === 'none' ? 'bg-white text-[#14a46c] shadow-sm' : 'text-[#5f6b7a]'}`}>OVERVIEW</button>
+                  <button onClick={() => setComparisonMode('variant')} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all ${comparisonMode === 'variant' ? 'bg-white text-[#14a46c] shadow-sm' : 'text-[#5f6b7a]'}`}>VS VARIANT</button>
+                  <button onClick={() => setComparisonMode('period')} className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all ${comparisonMode === 'period' ? 'bg-white text-[#14a46c] shadow-sm' : 'text-[#5f6b7a]'}`}>
+                    {totals.isWeekly ? 'VS PREV WEEK' : 'VS PREV PERIOD'}
+                  </button>
+                </div>
               </div>
               <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
-                <KpiCard label="LP CTA Click Users" value={num(totals.clicks)} sub="Install-button clicks, not page renders" tip={KPI_TOOLTIPS['LP CTA Click Users']} />
-                <KpiCard label="Install Users" value={num(totals.installs)} sub={`${pct(totals.installCvr)} Install CVR`} highlight 
+                <KpiCard label="LP CTA Click Users" value={num(totals.current.clicks)} sub="Install-button clicks, not page renders" tip={KPI_TOOLTIPS['LP CTA Click Users']} 
+                  benchmark={comparisonMode === 'period' ? { val: num(totals.current.clicks - totals.prev.clicks), isPositive: totals.current.clicks >= totals.prev.clicks } : undefined}
+                />
+                <KpiCard label="Install Users" value={num(totals.current.installs)} sub={`${pct(totals.current.installCvr)} Install CVR`} highlight 
                   tip={KPI_TOOLTIPS['Install Users']}
-                  benchmark={isBenchmark && topLp && botLp ? { 
+                  benchmark={comparisonMode === 'variant' && topLp && botLp ? { 
                     val: ((topLp.installCvr - botLp.installCvr) * 100).toFixed(1) + 'pp', 
                     isPositive: topLp.installCvr >= botLp.installCvr 
+                  } : comparisonMode === 'period' ? {
+                    val: ((totals.current.installCvr - totals.prev.installCvr) * 100).toFixed(1) + 'pp',
+                    isPositive: totals.current.installCvr >= totals.prev.installCvr
                   } : undefined}
                 />
-                <KpiCard label="Qualified Activated" value={num(totals.tries)} sub="Completed the full funnel" highlight tip={KPI_TOOLTIPS['Qualified Activated']}
-                  benchmark={isBenchmark && topLp && botLp ? { 
+                <KpiCard label="Qualified Activated" value={num(totals.current.tries)} sub="Completed the full funnel" highlight tip={KPI_TOOLTIPS['Qualified Activated']}
+                  benchmark={comparisonMode === 'variant' && topLp && botLp ? { 
                     val: num(topLp.tries - botLp.tries), 
                     isPositive: topLp.tries >= botLp.tries 
+                  } : comparisonMode === 'period' ? {
+                    val: num(totals.current.tries - totals.prev.tries),
+                    isPositive: totals.current.tries >= totals.prev.tries
                   } : undefined}
                 />
-                <KpiCard label="Activation CVR" value={pct(totals.actCvr)} sub="LP clicker → Activated user" highlight 
+                <KpiCard label="Activation CVR" value={pct(totals.current.actCvr)} sub="LP clicker → Activated user" highlight 
                   tip={KPI_TOOLTIPS['Activation CVR']}
-                  benchmark={isBenchmark && topLp && botLp ? { 
+                  benchmark={comparisonMode === 'variant' && topLp && botLp ? { 
                     val: ((topLp.actCvr - botLp.actCvr) * 100).toFixed(1) + 'pp', 
                     isPositive: topLp.actCvr >= botLp.actCvr 
+                  } : comparisonMode === 'period' ? {
+                    val: ((totals.current.actCvr - totals.prev.actCvr) * 100).toFixed(1) + 'pp',
+                    isPositive: totals.current.actCvr >= totals.prev.actCvr
                   } : undefined}
                 />
-                <KpiCard label="Dead Install Rate" value={pct(totals.deadRate)} sub="Lower is better" warn tip={KPI_TOOLTIPS['Dead Install Rate']}
-                  benchmark={isBenchmark && topLp && botLp ? { 
+                <KpiCard label="Dead Install Rate" value={pct(totals.current.deadRate)} sub="Lower is better" warn tip={KPI_TOOLTIPS['Dead Install Rate']}
+                  benchmark={comparisonMode === 'variant' && topLp && botLp ? { 
                     val: ((topLp.deadRate - botLp.deadRate) * 100).toFixed(1) + 'pp', 
                     isPositive: topLp.deadRate <= botLp.deadRate 
+                  } : comparisonMode === 'period' ? {
+                    val: ((totals.current.deadRate - totals.prev.deadRate) * 100).toFixed(1) + 'pp',
+                    isPositive: totals.current.deadRate <= totals.prev.deadRate
                   } : undefined}
                 />
-                <KpiCard label="Repeat Try Rate" value={pct(totals.repeatRate)} sub="Habitual product usage" tip={KPI_TOOLTIPS['Repeat Try Rate']}
-                  benchmark={isBenchmark && topLp && botLp ? { 
+                <KpiCard label="Repeat Try Rate" value={pct(totals.current.repeatRate)} sub="Habitual product usage" tip={KPI_TOOLTIPS['Repeat Try Rate']}
+                  benchmark={comparisonMode === 'variant' && topLp && botLp ? { 
                     val: ((topLp.repeatRate - botLp.repeatRate) * 100).toFixed(1) + 'pp', 
                     isPositive: topLp.repeatRate >= botLp.repeatRate 
+                  } : comparisonMode === 'period' ? {
+                    val: ((totals.current.repeatRate - totals.prev.repeatRate) * 100).toFixed(1) + 'pp',
+                    isPositive: totals.current.repeatRate >= totals.prev.repeatRate
                   } : undefined}
                 />
               </div>
@@ -756,7 +794,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
               </div>
 
               {/* Fountain Flow */}
-              <FountainVis total={totals.clicks} installs={totals.installs} tries={totals.tries} repeat={totals.repeatUsers} />
+              <FountainVis total={totals.current.clicks} installs={totals.current.installs} tries={totals.current.tries} repeat={totals.current.repeatUsers} />
 
               {/* Insights */}
               {topLp && botLp && (
@@ -807,7 +845,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                     </div>
                     <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors" title="7-day rolling average to smooth daily noise">
                       <input type="checkbox" checked={showRolling} onChange={e => { setShowRolling(e.target.checked); if(e.target.checked) setIsCumulative(false); }} className="accent-[#14a46c]" />
-                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Weekly Smooth</span>
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Rolling</span>
                     </label>
                     <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
                       <input type="checkbox" checked={showWeekends} onChange={e => setShowWeekends(e.target.checked)} className="accent-[#14a46c]" />
@@ -914,7 +952,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                   <div className="flex items-center gap-2">
                     <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors" title="7-day rolling average to smooth daily noise">
                       <input type="checkbox" checked={showRolling} onChange={e => setShowRolling(e.target.checked)} className="accent-[#14a46c]" />
-                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Weekly Smooth</span>
+                      <span className="text-[9px] font-bold text-[#5f6b7a] group-hover:text-[#1b2333] uppercase">Rolling</span>
                     </label>
                     <label className="flex items-center gap-1.5 cursor-pointer group bg-[#f1f5f9] px-2 py-1 rounded-lg hover:bg-[#e2e8f0] transition-colors">
                       <input type="checkbox" checked={showWeekends} onChange={e => setShowWeekends(e.target.checked)} className="accent-[#14a46c]" />
