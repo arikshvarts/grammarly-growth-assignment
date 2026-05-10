@@ -426,12 +426,12 @@ export default function LandingPage() {
               </div>
 
               {step === 0 && (
-                <div className="col-span-12 lg:col-span-5 relative hidden lg:flex flex-col items-center justify-center">
+                <div className="col-span-12 lg:col-span-5 relative hidden lg:flex flex-col items-center justify-center lg:translate-x-12 overflow-visible">
                   <SplineScene
                     scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                     className="w-full h-full min-h-[400px]"
                   />
-                  <div className="absolute bottom-10 right-10 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-xs font-medium text-white/80 flex items-center gap-2" aria-hidden="true">
+                  <div className="absolute bottom-10 right-0 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 text-xs font-medium text-white/80 flex items-center gap-2" aria-hidden="true">
                     <Sparkles className="w-4 h-4 text-accent" />
                     Previewing Humanizer AI
                   </div>
