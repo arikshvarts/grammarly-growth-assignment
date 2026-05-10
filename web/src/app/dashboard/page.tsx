@@ -20,7 +20,6 @@ export default async function DashboardPage() {
       cohortCsv={read('cohort_metrics.csv')}
       dailyCsv={read('daily_event_metrics.csv')}
       featureCsv={read('feature_metrics.csv')}
-      qaCsv={read('qa_summary.csv')}
     />
   );
 }

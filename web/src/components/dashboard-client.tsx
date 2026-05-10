@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Papa from 'papaparse';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, Info, X } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface UserFunnel {
@@ -39,12 +39,6 @@ interface FeatureRow {
   try_users: string;
   total_try_users: string;
   feature_share_within_lp: string;
-}
-interface QARow {
-  check: string;
-  severity: string;
-  flagged_rows: string;
-  explanation: string;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -89,7 +83,6 @@ export interface DashboardClientProps {
   cohortCsv: string;
   dailyCsv: string;
   featureCsv: string;
-  qaCsv: string;
 }
 // ── Tooltip ────────────────────────────────────────────────────────────────────
 function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
@@ -179,6 +172,125 @@ function Badge({ color, children }: { color: string; children: React.ReactNode }
       style={{ background: color + '18', color }}>
       {children}
     </span>
+  );
+}
+
+// ── Methodology Modal ──────────────────────────────────────────────────────────
+function MethodologyModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1b2333]/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-[#f8faf9] w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="p-6 border-b border-[#dde4e1] bg-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#eaf7f1] rounded-xl flex items-center justify-center text-[#14a46c]">
+              <Info className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-[#1b2333]">Methodology & Attribution Logic</h2>
+              <p className="text-xs text-[#5f6b7a]">Technical definitions and measurement constraints</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-[#f1f5f9] rounded-full transition-colors text-[#5f6b7a]">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        
+        <div className="p-8 overflow-y-auto space-y-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <section>
+                <div className="text-sm font-bold text-[#1b2333] mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14a46c]" />
+                  Technical Methodology
+                </div>
+                <div className="text-xs text-[#5f6b7a] space-y-4 leading-relaxed bg-white p-5 rounded-2xl border border-[#dde4e1]">
+                  <p><strong>1. User-Level Sequence:</strong> Qualified Activation requires the sequence of <strong>LP click, followed by install, and finally try_grammarly</strong> within 7 days.</p>
+                  <p><strong>2. Cohort vs. Event Date:</strong> Conversion metrics are <strong>cohort-based</strong> (anchored on first click date) to prevent day-of-acquisition mixing.</p>
+                  <p><strong>3. Right-Censoring:</strong> The latest 7 days are excluded from finalized cohort metrics to avoid undercounting incomplete windows.</p>
+                </div>
+              </section>
+
+              <section>
+                <div className="text-sm font-bold text-[#1b2333] mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14a46c]" />
+                  Metric Formulas
+                </div>
+                <div className="bg-white rounded-2xl border border-[#dde4e1] overflow-hidden shadow-sm">
+                  <table className="w-full text-xs">
+                    <thead className="text-[#5f6b7a] border-b border-[#dde4e1] bg-[#f8faf9]">
+                      <tr><th className="py-2.5 px-4 text-left font-semibold">Metric</th><th className="py-2.5 px-4 text-left font-semibold">Definition</th></tr>
+                    </thead>
+                    <tbody className="text-[#1b2333]">
+                      {[
+                        { m: 'LP CTA Click Users', f: 'Total unique users who clicked the install button on the landing page' },
+                        { m: 'Activation CVR', f: 'Percentage of LP clickers who successfully completed a feature try' },
+                        { m: 'Install → Try Rate', f: 'Percentage of users who used a feature after installing the app' },
+                        { m: 'Dead Install Rate', f: 'Percentage of users who installed but never used a feature within 7 days' },
+                        { m: 'Repeat Try Rate', f: 'Percentage of users who used features more than once' },
+                      ].map(({ m, f }) => (
+                        <tr key={m} className="border-b border-[#f1f5f9] last:border-0">
+                          <td className="py-2.5 px-4 font-semibold">{m}</td>
+                          <td className="py-2.5 px-4 text-[#5f6b7a]">{f}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+
+            <div className="space-y-6">
+              <section>
+                <div className="text-sm font-bold text-[#1b2333] mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  Measurement Constraints
+                </div>
+                <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm space-y-4">
+                  <div className="text-[10px] text-[#5f6b7a] uppercase font-bold tracking-wider">Cannot calculate from this dataset:</div>
+                  <ul className="text-xs text-[#5f6b7a] space-y-2">
+                    {['CAC: No spend data', 'ROAS: No revenue data', 'LTV: No subscription/payment data', 'Ad CTR: No impression data', 'Page-render CVR: No page_render event'].map(li => (
+                      <li key={li} className="flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-[#dde4e1]" />
+                        {li}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+
+              <section>
+                <div className="text-sm font-bold text-[#1b2333] mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#3d7dd4]" />
+                  Next Instrumentation
+                </div>
+                <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
+                  <ol className="text-xs text-[#5f6b7a] space-y-3">
+                    {[
+                      'Page render events → LP page-render CVR',
+                      'Ad spend per LP → CAC and ROAS analysis',
+                      'Subscription events → LTV and payback periods',
+                      'Onboarding step events → pinpoint dead install drop-off'
+                    ].map((li, i) => (
+                      <li key={li} className="flex gap-3">
+                        <span className="text-[#14a46c] font-bold">{i + 1}.</span>
+                        {li}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-6 bg-white border-t border-[#dde4e1] flex justify-end">
+          <button onClick={onClose} className="px-6 py-2.5 bg-[#14a46c] text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -427,8 +539,9 @@ function MiniLineChart({ series, height = 140, showWeekends = false, yAxisType =
   );
 }
 // ── Main Component ─────────────────────────────────────────────────────────────
-export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv, qaCsv }: DashboardClientProps) {
+export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const [showMethodology, setShowMethodology] = useState(false);
   const [showRolling, setShowRolling] = useState(false);
   const [isCumulative, setIsCumulative] = useState(false);
   const [showWeekends, setShowWeekends] = useState(false);
@@ -442,7 +555,6 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
   const cohortRaw = useMemo(() => Papa.parse<CohortRow>(cohortCsv, { header: true, skipEmptyLines: true }).data, [cohortCsv]);
   const dailyRaw = useMemo(() => Papa.parse<DailyRow>(dailyCsv, { header: true, skipEmptyLines: true }).data, [dailyCsv]);
   const featureRaw = useMemo(() => Papa.parse<FeatureRow>(featureCsv, { header: true, skipEmptyLines: true }).data, [featureCsv]);
-  const qaRaw = useMemo(() => Papa.parse<QARow>(qaCsv, { header: true, skipEmptyLines: true }).data, [qaCsv]);
 
   // Date bounds
   const { dateMin, dateMax } = useMemo(() => {
@@ -575,7 +687,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
   }, [totals]);
 
 
-  const TABS = ['Overview', 'LP Funnel', 'Feature Activation', 'Growth Actions', 'Methodology'];
+  const TABS = ['Overview', 'LP Funnel', 'Feature Activation', 'Growth Actions'];
   // ── Cohort line series ───────────────────────────────────────────────────────
   const cohortSeries = useMemo(() => selectedLps.map(lp => {
     const rows = cohortFiltered.filter(r => r.attributed_lp_name === lp).sort((a, b) => a.cohort_date.localeCompare(b.cohort_date));
@@ -636,7 +748,16 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-xs text-[#5f6b7a]">Feb 2026 dataset : User-level : First-touch attribution</div>
+          <div className="text-xs text-[#5f6b7a] flex items-center gap-2">
+            Feb 2026 dataset : User-level : First-touch attribution
+            <button 
+              onClick={() => setShowMethodology(true)}
+              className="w-5 h-5 bg-[#f1f5f9] hover:bg-[#e2e8f0] rounded-full flex items-center justify-center transition-colors group"
+              title="View Methodology"
+            >
+              <Info className="w-3 h-3 text-[#5f6b7a] group-hover:text-[#14a46c]" />
+            </button>
+          </div>
           <a href="/" className="text-xs font-semibold text-[#14a46c] hover:underline transition-all flex items-center gap-1">Back to Landing Page <ArrowRight className="w-3 h-3" /></a>
         </div>
       </div>
@@ -800,8 +921,8 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
               {topLp && botLp && (
                 <div className="space-y-3">
                   <div className="bg-[#eaf7f1] border border-[#b4e6cf] rounded-xl p-4 text-sm text-[#1b2333]">
-                    <strong>{(( topLp.actCvr - botLp.actCvr) * 100).toFixed(1)}% activation gap</strong> on comparable volume.
-                    {topLp.name} converts <strong>{pct(topLp.actCvr)}</strong> of LP clicks vs
+                    <strong>{(( topLp.actCvr - botLp.actCvr) * 100).toFixed(1)}% activation gap</strong> on comparable volume.{' '}
+                    {topLp.name} converts <strong>{pct(topLp.actCvr)}</strong> of LP clicks vs{' '}
                     <strong>{pct(botLp.actCvr)}</strong> for {botLp.name}.
                   </div>
                   <div className="bg-[#fdf2e9] border border-[#f5c7a0] rounded-xl p-4 text-sm text-[#1b2333]">
@@ -810,10 +931,10 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                   </div>
                   {topLp && botLp && botLp.actCvr > 0 && (
                     <div className="bg-[#f0f4ff] border border-[#c7d2fe] rounded-xl p-4 text-sm text-[#1b2333]">
-                      <strong>Impact sizing:</strong> If {botLp.name} matched {topLp.name}&apos;s
-                      <strong>{pct(topLp.actCvr)}</strong> Activation CVR, it would generate approximately
-                      <strong>+{num(Math.max(0, Math.round(topLp.actCvr * botLp.clicks - botLp.tries)))}</strong>
-                      additional activated users from the same traffic: a
+                      <strong>Impact sizing:</strong> If {botLp.name} matched {topLp.name}&apos;s{' '}
+                      <strong>{pct(topLp.actCvr)}</strong> Activation CVR, it would generate approximately{' '}
+                      <strong>+{num(Math.max(0, Math.round(topLp.actCvr * botLp.clicks - botLp.tries)))}</strong>{' '}
+                      additional activated users from the same traffic: a{' '}
                       <strong>{((topLp.actCvr / botLp.actCvr - 1) * 100).toFixed(0)}% lift</strong> at zero extra cost.
                     </div>
                   )}
@@ -1027,7 +1148,7 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
               {/* Feature insight */}
               <div className="bg-[#eaf7f1] border border-[#b4e6cf] rounded-xl p-4 text-sm text-[#1b2333]">
                 <strong>Feature routing is near-perfect.</strong> Academic Writing LP users go to{' '}
-                <code className="bg-white px-1 rounded text-[11px]">academic_citation_helper</code> (≈99.7%),
+                <code className="bg-white px-1 rounded text-[11px]">academic_citation_helper</code> (≈99.7%), and{' '}
                 Business Emails LP users go to <code className="bg-white px-1 rounded text-[11px]">smart_email_reply</code> (100%).
                 The activation problem is habit formation, not feature discovery.
               </div>
@@ -1108,8 +1229,8 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
                   })}
 
                   <div className="bg-[#f0f4ff] border border-[#c7d2fe] rounded-xl p-4 text-sm text-[#1b2333]">
-                    <strong>Growth Insight:</strong> If {botLp?.name} matched {topLp?.name}&apos;s <strong>{pct(topLp?.actCvr || 0)}</strong> Activation CVR, 
-                    it would generate approximately <strong>+{num(Math.max(0, Math.round((topLp?.actCvr || 0) * (botLp?.clicks || 0) - (botLp?.tries || 0))))}</strong> additional 
+                    <strong>Growth Insight:</strong> If {botLp?.name} matched {topLp?.name}&apos;s <strong>{pct(topLp?.actCvr || 0)}</strong> Activation CVR,{' '}
+                    it would generate approximately <strong>+{num(Math.max(0, Math.round((topLp?.actCvr || 0) * (botLp?.clicks || 0) - (botLp?.tries || 0))))}</strong> additional{' '}
                     activated users: a <strong>{(((topLp?.actCvr || 0) / (botLp?.actCvr || 0.001) - 1) * 100).toFixed(0)}% lift</strong> at zero extra acquisition cost.
                   </div>
 
@@ -1180,94 +1301,10 @@ export function DashboardClient({ userFunnelCsv, cohortCsv, dailyCsv, featureCsv
               </div>
             </div>
           )}
-          {/* ── TAB 4: METHODOLOGY ───────────────────────────────────── */}
-          {activeTab === 4 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-[#1b2333]">Methodology & Data Quality</h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
-                    <div className="text-sm font-bold text-[#1b2333] mb-2">Technical Methodology</div>
-                    <div className="text-xs text-[#5f6b7a] space-y-3">
-                      <p><strong>1. User-Level Sequence:</strong> Qualified Activation requires the sequence of <strong>LP click, followed by install, and finally try_grammarly</strong> within 7 days.</p>
-                      <p><strong>2. Cohort vs. Event Date:</strong> Conversion metrics are <strong>cohort-based</strong> (anchored on first click date) to prevent day-of-acquisition mixing.</p>
-                      <p><strong>3. Right-Censoring:</strong> The latest 7 days are excluded from finalized cohort metrics to avoid undercounting incomplete windows.</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
-                    <div className="text-sm font-bold text-[#1b2333] mb-3">Metric Formulas</div>
-                    <table className="w-full text-xs">
-                      <thead className="text-[#5f6b7a] border-b border-[#dde4e1]">
-                        <tr><th className="py-1.5 text-left pr-3">Metric</th><th className="py-1.5 text-left">Formula</th></tr>
-                      </thead>
-                      <tbody className="text-[#1b2333]">
-                        {[
-                          { m: 'LP CTA Click Users', f: 'COUNTD(user_id) where action = did_click_lp' },
-                          { m: 'Activation CVR', f: 'Qualified Activated / LP CTA Click Users' },
-                          { m: 'Install → Try Rate', f: 'Qualified Activated / Install Users' },
-                          { m: 'Dead Install Rate', f: '(Installs with no Try events within 7d) / Total Installs' },
-                          { m: 'Repeat Try Rate', f: 'Users with 2+ tries / Users with 1+' },
-                        ].map(({ m, f }) => (
-                          <tr key={m} className="border-b border-[#f1f5f9]">
-                            <td className="py-1.5 pr-3 font-semibold">{m}</td>
-                            <td className="py-1.5 text-[#5f6b7a]"><code className="bg-[#f8faf9] px-1 rounded">{f}</code></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
-                    <div className="text-sm font-bold text-[#1b2333] mb-2">Measurement Constraints</div>
-                    <div className="text-[10px] text-[#5f6b7a] mb-2 uppercase font-bold">Cannot calculate from this dataset:</div>
-                    <ul className="text-xs text-[#5f6b7a] space-y-1 list-disc list-inside">
-                      <li>CAC: No spend data</li>
-                      <li>ROAS: No revenue data</li>
-                      <li>LTV: No subscription/payment data</li>
-                      <li>Ad CTR: No impression data</li>
-                      <li>Page-render CVR: No page_render event</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
-                    <div className="text-sm font-bold text-[#1b2333] mb-2">Next Instrumentation</div>
-                    <ol className="text-xs text-[#5f6b7a] space-y-1 list-decimal list-inside">
-                      <li>Page render events → LP page-render CVR</li>
-                      <li>Ad spend per LP → CAC and ROAS analysis</li>
-                      <li>Subscription events → LTV and payback periods</li>
-                      <li>Onboarding step events → pinpoint dead install drop-off</li>
-                    </ol>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl border border-[#dde4e1] p-5 shadow-sm">
-                  <div className="text-sm font-bold text-[#1b2333] mb-1">Data Quality Checks</div>
-                  <div className="text-xs text-[#5f6b7a] mb-3">Automated checks from data_cleaning.py</div>
-                  <div className="space-y-2">
-                    {qaRaw.map(row => (
-                      <div key={row.check} className={`rounded-lg p-3 text-xs ${parseInt(row.flagged_rows) === 0 ? 'bg-[#eaf7f1] border border-[#b4e6cf]' : 'bg-[#fdf2e9] border border-[#f5c7a0]'}`}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className={`font-semibold ${parseInt(row.flagged_rows) === 0 ? 'text-[#14a46c]' : 'text-[#e2813a]'}`}>
-                            {parseInt(row.flagged_rows) === 0 ? '✓ No issues' : `⚠ ${row.flagged_rows} rows`}
-                          </span>
-                          <Badge color={row.severity === 'high' ? '#dc2626' : '#e2813a'}>{row.severity}</Badge>
-                        </div>
-                        <div className="font-medium text-[#1b2333]">{row.check.replace(/_/g, ' ')}</div>
-                        <div className="text-[#5f6b7a] mt-0.5">{row.explanation}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 bg-[#eaf7f1] border border-[#b4e6cf] rounded-lg p-3 text-xs text-[#14a46c] font-medium leading-relaxed">
-                    <strong>Note:</strong> All automated checks passed. In a production environment, non-zero flags would trigger investigation.
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
         </main>
       </div>
+
+      <MethodologyModal isOpen={showMethodology} onClose={() => setShowMethodology(false)} />
     </div>
   );
 }

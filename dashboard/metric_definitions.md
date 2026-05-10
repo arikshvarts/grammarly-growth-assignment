@@ -12,12 +12,12 @@ All metrics are calculated at the **user level** (Distinct User IDs), not raw ev
 
 | KPI | Formula | Why it matters |
 |---|---|---|
-| **LP CTA Click Users** | `COUNTD(user_id)` where action = `did_click_lp` | Entry point of the post-click campaign funnel. |
-| **Install CVR** | `Install Users / LP CTA Click Users` | Measures acquisition quality and install-bridge friction. |
-| **Activation CVR** | `Qualified Activated / LP CTA Click Users` | North Star metric: end-to-end campaign quality. |
-| **Install → Try Rate** | `Qualified Activated / Install Users` | Isolates onboarding success from LP quality. |
-| **Dead Install Rate** | `(Install Users − Activated) / Install Users` | Identifies users who abandoned after the hard step (install). |
-| **Repeat Try Rate** | `Users with 2+ try events / Users with 1+ try` | Measures initial habit formation and utility. |
+| **LP CTA Click Users** | Total unique users who clicked the install button on the landing page. | Entry point of the post-click campaign funnel. |
+| **Install CVR** | Percentage of LP clickers who successfully installed the app. | Measures acquisition quality and install-bridge friction. |
+| **Activation CVR** | Percentage of LP clickers who successfully completed a feature try. | North Star metric: end-to-end campaign quality. |
+| **Install → Try Rate** | Percentage of users who used a feature after installing the app. | Isolates onboarding success from LP quality. |
+| **Dead Install Rate** | Percentage of users who installed but never used a feature within 7 days. | Identifies users who abandoned after the hard step (install). |
+| **Repeat Try Rate** | Percentage of users who used features more than once. | Measures initial habit formation and utility. |
 
 ---
 
